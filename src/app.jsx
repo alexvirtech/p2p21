@@ -1,13 +1,13 @@
 import { useState, useEffect, useRef } from "preact/hooks"
 import { Peer } from "peerjs"
-import { peerConfig1 } from "./config"
+import { peerConfig1 } from "./utils/config"
 
 export function App() {
     const [myId, setMyId] = useState()
     const [recId, setRecId] = useState()
     const [peer, setPeer] = useState(null)
     const [conn, setConn] = useState(null)
-    const [call, setCall] = useState(null)    
+    const [call, setCall] = useState(null)
     const [localStream, setLocalStream] = useState(null)
     const myVideo = useRef(null)
     const repVideo = useRef(null)
@@ -23,11 +23,19 @@ export function App() {
     // Initialize my video stream and create a new Peer with a generated ID
     const init = async () => {
         try {
-            const myVideo = document.getElementById("myVideo")
-            localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-            myVideo.srcObject = localStream
+            //const myVideo = document.getElementById("myVideo")
+            const ls = await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+            setLocalStream(ls)
+            myVideo.current.srcObject = ls
 
-            peer = new Peer(peerConfig1)
+            setPeer(new Peer(peerConfig1))
+        } catch (error) {
+            console.error("Error accessing media devices.", error)
+        }
+    }
+
+    useEffect(() => {
+        if (peer) {
             peer.on("open", (id) => {
                 setMyId(id)
                 console.log("Peer ID:", id)
@@ -39,39 +47,36 @@ export function App() {
                 incomingCall.answer(localStream)
                 incomingCall.on("stream", (remoteStream) => {
                     const repVideo = document.getElementById("repVideo")
-                    repVideo.srcObject = remoteStream
+                    repVideo.current.srcObject = remoteStream
                 })
             })
 
             // Handle incoming data connections
             peer.on("connection", (connection) => {
-                conn = connection
+                setConn(connection)
                 conn.on("data", (data) => {
                     console.log("Received:", data)
                     addMessage(data, false)
                 })
                 conn.on("open", () => {
                     console.log("Connection opened")
-                    document.getElementById("recId").value = connection.peer
+                    recId = connection.peer
                     updateUIForConnectedState()
                 })
             })
-        } catch (error) {
-            console.error("Error accessing media devices.", error)
         }
-    }
+    }, [peer])
 
     // Connect to the recipient peer
     const connect = async (e) => {
         e.preventDefault()
-        const recId = document.getElementById("recId").value
 
         if (!peer) {
             console.error("Peer not initialized.")
             return
         }
 
-        conn = peer.connect(recId)
+        setConn(peer.connect(recId))
         conn.on("open", () => {
             console.log("Connected to:", recId)
             updateUIForConnectedState()
@@ -83,10 +88,10 @@ export function App() {
             })
 
             // Make a call to the recipient
-            call = peer.call(recId, localStream)
+            setCall(peer.call(recId.current.value, localStream))
             call.on("stream", (remoteStream) => {
-                const repVideo = document.getElementById("repVideo")
-                repVideo.srcObject = remoteStream
+                //const repVideo = document.getElementById("repVideo")
+                repVideo.current.srcObject = remoteStream
             })
         })
 
@@ -95,28 +100,24 @@ export function App() {
         })
     }
 
-    // Update UI for connected state
-    const updateUIForConnectedState = () => {
-        document.getElementById("recId").readOnly = true
-        //document.getElementById("connectButton").innerText = "Disconnect"
-        //document.getElementById("connectButton").onclick = disconnect
-        document.getElementById("messages").style.display = "block"
-        //document.getElementById("statusBar").innerText = "connected"
-    }
-
     // Disconnect the peer connection
     const disconnect = () => {
         if (call) call.close()
         if (conn) conn.close()
         if (peer) peer.destroy()
 
-        document.getElementById("recId").readOnly = false
+        //document.getElementById("recId").readOnly = false
         //document.getElementById("connectButton").innerText = "Connect"
         //document.getElementById("connectButton").onclick = (e) => connect(e)
-        document.getElementById("messages").style.display = "none"
+        //document.getElementById("messages").style.display = "none"
         //document.getElementById("statusBar").innerText = "not connected"
-        document.getElementById("myVideo").srcObject = null
-        document.getElementById("repVideo").srcObject = null
+        //document.getElementById("myVideo").srcObject = null
+        //messages.current.style.display = "none"
+        setRecId("")
+        myVideo.current.srcObject = null
+        repVideo.current.srcObject = null
+        setIsConnected(false)
+        //document.getElementById("repVideo").srcObject = null
 
         init()
     }
@@ -162,8 +163,13 @@ export function App() {
 
                     <div class="w-full">
                         <div>Recipient</div>
-                        <input type="text" class="border border-gray-400 p-2 rounded w-full" 
-                        value={recId} onChange={e=>setRecId(e.target.value)} />
+                        <input
+                            type="text"
+                            class="border border-gray-400 p-2 rounded w-full"
+                            readOnly={isConnected}
+                            value={recId}
+                            onChange={(e) => setRecId(e.target.value)}
+                        />
                     </div>
                     <div class="py-2">
                         <button
@@ -182,24 +188,26 @@ export function App() {
                     <video autoplay ref={repVideo} class="max-w-[50%] border border-gray-400 p-2 rounded"></video>
                 </div>
 
-                <div class="flex flex-col w-full" style="display:none" id="messages">
-                    <form onsubmit={send}>
-                        <div
-                            class="grow border border-gray-400 w-full h-60 mb-4 rounded overflow-y-auto overflow-x-hidden px-4 py-2"
-                            id="allMessages"
-                        ></div>
-                        <div class="flex justify-between gap-2">
-                            <input type="text" class="border border-gray-400 p-2 rounded grow" id="chatMessage" />
-                            <button
-                                type="submit"
-                                class="h-auto bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                                id="sendButton"
-                            >
-                                Send
-                            </button>
-                        </div>
-                    </form>
-                </div>
+                {isConnected && (
+                    <div class="flex flex-col w-full" style="display:none">
+                        <form onsubmit={send}>
+                            <div
+                                class="grow border border-gray-400 w-full h-60 mb-4 rounded overflow-y-auto overflow-x-hidden px-4 py-2"
+                                id="allMessages"
+                            ></div>
+                            <div class="flex justify-between gap-2">
+                                <input type="text" class="border border-gray-400 p-2 rounded grow" id="chatMessage" />
+                                <button
+                                    type="submit"
+                                    class="h-auto bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                                    id="sendButton"
+                                >
+                                    Send
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                )}
             </div>
             <div class="text-center">{isConnected ? "Connected" : "Not connected"}</div>
         </div>
