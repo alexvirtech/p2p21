@@ -1,12 +1,12 @@
-import { useEffect, useState } from 'preact/hooks'
+import { useEffect, useState } from "preact/hooks"
 import { Peer } from "peerjs"
 import { peerConfig } from "../utils/config"
 
-export const usePeer = ({myId,localStream,getMessage,disconnect}) => {
+export const usePeer = ({ myId, localStream, getMessage, disconnect }) => {
     const [peer, setPeer] = useState(null)
     const [conn, setConn] = useState(null)
     const [call, setCall] = useState(null)
-    const [remoteStream, setRemoteStream] = useState(null)    
+    const [remoteStream, setRemoteStream] = useState(null)
 
     useEffect(() => {
         init()
@@ -14,43 +14,36 @@ export const usePeer = ({myId,localStream,getMessage,disconnect}) => {
 
     const init = async () => {
         try {
-            //const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-            const peer = new Peer(myId, peerConfig)
-            setPeer(peer)
-            //setLocalStream(stream)
+            setPeer(new Peer(myId, peerConfig))
         } catch (error) {
-            console.error("Error accessing media devices.", error)
+            console.error("Error creating peer:", error)
         }
     }
 
     useEffect(() => {
-        if (peer) {
-            peer.on("open", (id) => {                
-                console.log("Peer ID:", id)
-            })
+        if (!peer) return
+        // handle peer open event for my side
+        peer.on("open", (id) => {
+            console.log("Peer ID:", id)
+        })
 
-            // Handle incoming calls
-            peer.on("call", (incomingCall) => {
-                console.log("Receiving call...")
-                incomingCall.answer(localStream)
-                incomingCall.on("stream", (remStream) => {
-                    setRemoteStream(remStream)
-                })
+        // Handle incoming calls
+        peer.on("call", (incomingCall) => {
+            console.log("Receiving call...")
+            incomingCall.answer(localStream)
+            incomingCall.on("stream", (remStream) => {
+                setRemoteStream(remStream)
             })
+        })
 
-            // Handle incoming data connections
-            peer.on("connection", (connection) => {
-                connection.on("open", () => {
-                    console.log("Connection opened with " + connection.peer)
-                    //recId(connection.peer)
-                })
-                setConn(connection)
-            })
+        // Handle incoming data connections
+        peer.on("connection", (connection) => {            
+            setConn(connection)
+        })
 
-            peer.on("error", (err) => {
-                console.error("Peer error:", err)
-            })
-        }
+        peer.on("error", (err) => {
+            console.error("Peer error:", err)
+        })
     }, [peer])
 
     useEffect(() => {
@@ -58,10 +51,10 @@ export const usePeer = ({myId,localStream,getMessage,disconnect}) => {
         conn.on("open", () => {
             console.log("Connected to:", conn.peer)
 
-            // Set up data connection handler
+            // Handle data received from another side 
             conn.on("data", (data) => {
                 console.log("Received:", data)
-                getMessage({ message: data, isMine: false })                
+                getMessage({ message: data, isMine: false })
             })
 
             // Handle data connection close event
@@ -70,9 +63,8 @@ export const usePeer = ({myId,localStream,getMessage,disconnect}) => {
                 disconnect()
             })
 
-            // Make a call to the recipient           
+            // Make a call to the recipient, sending him my local stream
             setCall(peer.call(conn.peer, localStream))
-            
         })
 
         conn.on("error", (err) => {
@@ -82,8 +74,9 @@ export const usePeer = ({myId,localStream,getMessage,disconnect}) => {
 
     useEffect(() => {
         if (!call) return
-        call.on("stream", (remStream) => {      
-            setRemoteStream(remStream)                 
+        //handle stream received from another side
+        call.on("stream", (remStream) => {
+            setRemoteStream(remStream)
         })
 
         call.on("close", () => {
@@ -106,9 +99,8 @@ export const usePeer = ({myId,localStream,getMessage,disconnect}) => {
 
     const disconnect = () => {
         if (call) call.close()
-        if (conn) conn.close()        
+        if (conn) conn.close()
     }
-
 
     return { remoteStream, peer, conn, call, connect, disconnect }
 }
