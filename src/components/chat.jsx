@@ -24,7 +24,7 @@ export default function Chat() {
     }, [state.messages])
 
     return (
-        state.remoteStream && (
+        (state.remoteStream || true) && (
             <div class="flex flex-col w-full grow h-full min-h-0">
                 <div class="flex flex-col flex-grow min-h-0 overflow-hidden">
                     <div

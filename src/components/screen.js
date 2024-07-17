@@ -48,24 +48,24 @@ const Screen = () => {
     }
 
     return (
-        <div className="flex flex-col items-center max-w-[600px]">
-            <div className="flex justify-around w-full p-2">
+        <div className="flex flex-col items-center w-full">
+            {/* <div className="flex justify-around w-full p-2">
                 <button
                     className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
                     onClick={startScreenShare}
                 >
                     Share Screen
                 </button>
-            </div>
+            </div> */}
             <div className="w-full">
-                <div className="w-full p-2">
-                    <h2 className="text-center text-lg">My Screen</h2>
-                    <video ref={localVideoRef} autoPlay className="w-full h-auto border border-gray-300 rounded"></video>
+                <div class="w-full p-2">
+                   {/*  <h2 class="">My Screen</h2> */}
+                    <video ref={localVideoRef} autoPlay className="w-full h-auto "></video>
                 </div>
-                <div className="w-full p-2">
+                {/* <div className="w-full p-2">
                     <h2 className="text-center text-lg">Remote Screen</h2>
-                    <video ref={remoteVideoRef} autoPlay className="w-full h-auto border border-gray-300 rounded"></video>
-                </div>
+                    <video ref={remoteVideoRef} autoPlay className="w-full h-auto border border-gray-400 rounded"></video>
+                </div> */}
             </div>
         </div>
     )
