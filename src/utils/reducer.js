@@ -9,6 +9,8 @@ export const InitState = {
 
 export const reducer = (state, action) => {
     switch (action.type) {
+        case "SET_PEER":
+            return { ...state, ...action.payload } // peer,conn,call,localStream,remoteStream
         case "INIT":
             return { ...state, peer: action.payload.peer, localStream: action.payload.stream }       
         case "SET_REMOTE_STREAM":

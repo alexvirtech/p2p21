@@ -1,25 +1,31 @@
 import { useEffect, useState } from "preact/hooks"
 import { Peer } from "peerjs"
 import { peerConfig } from "../utils/config"
+import { useStream } from "./useStream"
 
-export const usePeer = ({ myId, localStream, getMessage, disconnect }) => {
+export const usePeer = (myId,close) => {
     const [peer, setPeer] = useState(null)
     const [conn, setConn] = useState(null)
     const [call, setCall] = useState(null)
+    const [message, setMessage] = useState("")
     const [remoteStream, setRemoteStream] = useState(null)
+    const { localStream } = useStream()
 
     useEffect(() => {
         init()
     }, [])
 
+    // initialize new peer
     const init = async () => {
         try {
-            setPeer(new Peer(myId, peerConfig))
+            const pr = myId ? new Peer(myId, peerConfig) : new Peer(peerConfig)
+            setPeer(pr)
         } catch (error) {
             console.error("Error creating peer:", error)
         }
     }
 
+    // on peer create
     useEffect(() => {
         if (!peer) return
         // handle peer open event for my side
@@ -37,7 +43,7 @@ export const usePeer = ({ myId, localStream, getMessage, disconnect }) => {
         })
 
         // Handle incoming data connections
-        peer.on("connection", (connection) => {            
+        peer.on("connection", (connection) => {
             setConn(connection)
         })
 
@@ -46,15 +52,16 @@ export const usePeer = ({ myId, localStream, getMessage, disconnect }) => {
         })
     }, [peer])
 
+    // on connection create
     useEffect(() => {
         if (!conn) return
         conn.on("open", () => {
             console.log("Connected to:", conn.peer)
 
-            // Handle data received from another side 
+            // Handle data received from another side
             conn.on("data", (data) => {
                 console.log("Received:", data)
-                getMessage({ message: data, isMine: false })
+                setMessage(data)
             })
 
             // Handle data connection close event
@@ -91,16 +98,15 @@ export const usePeer = ({ myId, localStream, getMessage, disconnect }) => {
 
     const connect = (recId) => {
         const connection = peer.connect(recId)
-        connection.on("open", () => {
-            console.log("Connection opened")
-        })
         setConn(connection)
     }
 
     const disconnect = () => {
         if (call) call.close()
         if (conn) conn.close()
+        setRemoteStream(null)
+        close()
     }
 
-    return { remoteStream, peer, conn, call, connect, disconnect }
+    return { localStream, remoteStream, peer, conn, call, message, connect, disconnect }
 }

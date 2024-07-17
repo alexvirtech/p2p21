@@ -4,6 +4,7 @@ import { InitState, reducer } from "./utils/reducer"
 import Chat from "./components/chat"
 import Video from "./components/video"
 import Status from "./components/status"
+//import Caller from "./components/caller1"
 import Caller from "./components/caller"
 
 export function App() {
