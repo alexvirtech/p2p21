@@ -1,9 +1,11 @@
-import { useEffect, useState } from "preact/hooks"
+import { useEffect, useState, useContext } from "preact/hooks"
 import { Peer } from "peerjs"
 import { peerConfig } from "../utils/config"
 import { useStream } from "./useStream"
+import { Context } from "../utils/context"
 
-export const usePeer = (myId,close) => {
+export const usePeer = (myId) => {
+    const { state, dispatch } = useContext(Context)
     const [peer, setPeer] = useState(null)
     const [conn, setConn] = useState(null)
     const [call, setCall] = useState(null)
@@ -14,6 +16,10 @@ export const usePeer = (myId,close) => {
     useEffect(() => {
         init()
     }, [])
+
+    useEffect(() => {
+        dispatch({ type: "SET_PEER", payload: { localStream } })
+    }, [localStream])
 
     // initialize new peer
     const init = async () => {
@@ -30,15 +36,18 @@ export const usePeer = (myId,close) => {
         if (!peer) return
         // handle peer open event for my side
         peer.on("open", (id) => {
+            dispatch({ type: "SET_PEER", payload: { peer } })
             console.log("Peer ID:", id)
         })
 
         // Handle incoming calls
         peer.on("call", (incomingCall) => {
+            dispatch({ type: "SET_PEER", payload: { call:incomingCall } })
             console.log("Receiving call...")
             incomingCall.answer(localStream)
             incomingCall.on("stream", (remStream) => {
                 setRemoteStream(remStream)
+                dispatch({ type: "SET_PEER", payload: { remoteStream:remStream } })
             })
         })
 
@@ -56,6 +65,7 @@ export const usePeer = (myId,close) => {
     useEffect(() => {
         if (!conn) return
         conn.on("open", () => {
+            dispatch({ type: "SET_PEER", payload: { conn } })      
             console.log("Connected to:", conn.peer)
 
             // Handle data received from another side
@@ -81,9 +91,13 @@ export const usePeer = (myId,close) => {
 
     useEffect(() => {
         if (!call) return
+
+        dispatch({ type: "SET_PEER", payload: { call } })       
+
         //handle stream received from another side
         call.on("stream", (remStream) => {
             setRemoteStream(remStream)
+            dispatch({ type: "SET_PEER", payload: { remoteStream } })
         })
 
         call.on("close", () => {
@@ -105,7 +119,8 @@ export const usePeer = (myId,close) => {
         if (call) call.close()
         if (conn) conn.close()
         setRemoteStream(null)
-        close()
+        dispatch({ type: "SET_PEER", payload: { remoteStream:null, peer:null, conn:null, call:null } })     
+        //close()
     }
 
     return { localStream, remoteStream, peer, conn, call, message, connect, disconnect }

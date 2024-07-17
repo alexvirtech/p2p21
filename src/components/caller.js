@@ -6,40 +6,28 @@ export default function Caller() {
     const { state, dispatch } = useContext(Context)
     const [recId, setRecId] = useState("")
 
-    const close = () => {
+    const { localStream, remoteStream, peer, conn, call, message, connect, disconnect } = usePeer(null)
+
+    /*  const close = () => {
         dispatch({ type: "SET_PEER", payload: { remoteStream:null, peer:null, conn:null, call:null } })            
         setRecId("")
-    }
-
-    const { localStream, remoteStream, peer, conn, call, message, connect, disconnect } = usePeer(null,close)
+    } */
 
     useEffect(() => {
         return () => {
             disconnect()
+            setRecId("")
         }
     }, [])
 
     useEffect(() => {
-        if (peer?.id) {
-            dispatch({ type: "SET_PEER", payload: { localStream, remoteStream, peer } })
+        //if(!state.conn) return
+        if (state.conn) {
+            setRecId(state.conn.peer)
+        } else {
+            setRecId("")
         }
-    }, [peer?.id])
-
-    useEffect(() => {
-        if (!conn) return
-            dispatch({ type: "SET_PEER", payload: { conn } })        
-    }, [conn])
-
-    useEffect(() => {
-        if (!call) return
-            dispatch({ type: "SET_PEER", payload: { call } })        
-    }, [call])
-
-    useEffect(() => {
-        if (!remoteStream) return
-        dispatch({ type: "SET_PEER", payload: { remoteStream } })
-        setRecId(conn.peer)
-    }, [remoteStream])
+    }, [state.conn])
 
     useEffect(() => {
         if (message === "") return
@@ -53,10 +41,11 @@ export default function Caller() {
 
     const handleConnect = (e) => {
         e.preventDefault()
-        if (conn) {
+        if (state.conn) {
             disconnect()
+            setRecId("")
         } else {
-            connect(recId)            
+            connect(recId)
         }
     }
 
@@ -64,7 +53,13 @@ export default function Caller() {
         <form onSubmit={connect}>
             <div class="w-full">
                 <div>My Nickname</div>
-                <input type="text" class="border border-gray-400 p-2 rounded w-full" value={peer.id} onClick={getId} readonly />
+                <input
+                    type="text"
+                    class="border border-gray-400 p-2 rounded w-full"
+                    value={state.peer?.id}
+                    onClick={getId}
+                    readonly
+                />
             </div>
 
             <div class="w-full">
@@ -72,12 +67,12 @@ export default function Caller() {
                 <input
                     type="text"
                     class="border border-gray-400 p-2 rounded w-full"
-                    readOnly={conn}
+                    readOnly={state.conn ?? false}
                     value={recId}
-                    onClick={async (e) =>{
-                         e.target.value = await navigator.clipboard.readText()
-                         setRecId(e.target.value)
-                        }}
+                    onClick={async (e) => {
+                        e.target.value = await navigator.clipboard.readText()
+                        setRecId(e.target.value)
+                    }}
                     onChange={(e) => setRecId(e.target.value)}
                 />
             </div>
@@ -87,7 +82,7 @@ export default function Caller() {
                     class="h-auto bg-blue-500 hover:bg-blue-700 text-white font-bold py-[9px] px-4 rounded"
                     onClick={handleConnect}
                 >
-                    {conn ? "Disconnect" : "Connect"}
+                    {state.conn ? "Disconnect" : "Connect"}
                 </button>
             </div>
         </form>
