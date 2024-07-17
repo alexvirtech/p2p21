@@ -120,8 +120,7 @@ export const usePeer = (myId) => {
         if (conn) conn.close()
         setRemoteStream(null)
         dispatch({ type: "SET_PEER", payload: { remoteStream:null, peer:null, conn:null, call:null } })     
-        //close()
     }
 
-    return { localStream, remoteStream, peer, conn, call, message, connect, disconnect }
+    return { peer, message, connect, disconnect }
 }

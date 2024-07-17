@@ -25,16 +25,18 @@ export default function Chat() {
 
     return (
         state.remoteStream && (
-            <div class="flex flex-col w-full">
-                <form onsubmit={send}>
+            <div class="flex flex-col w-full grow h-full min-h-0">
+                <div class="flex flex-col flex-grow min-h-0 overflow-hidden">
                     <div
-                        class="grow border border-gray-400 w-full h-60 mb-4 rounded overflow-y-auto overflow-x-hidden px-4 py-2"
+                        class="border border-gray-400 w-full flex-grow mb-4 rounded overflow-y-auto overflow-x-hidden px-4 py-2"
                         ref={allMessages}
                     >
                         {state.messages.map((msg) => (
                             <div class={msg.isMine ? "text-left pr-12" : "text-right pl-12"}>{msg.message}</div>
                         ))}
                     </div>
+                </div>
+                <form onsubmit={send} class="flex-none">
                     <div class="flex justify-between gap-2">
                         <input type="text" class="border border-gray-400 p-2 rounded grow" ref={textInput} />
                         <button
