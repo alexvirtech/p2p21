@@ -36,7 +36,9 @@ export const usePeer = (myId, dispatch, state) => {
                 incomingCall.on("stream", (remoteStream) => {
                     conn.on("data", (data) => {
                         if (data && data.type === "screen") {
-                            dispatch({ type: "SET_TEMP_STREAM", payload: remoteStream })                            
+                            dispatch({ type: "SET_TEMP_STREAM", payload: remoteStream })
+                        } else if (data.type === "stopScreen") {
+                            stopSharedScreen()                        
                         } else {
                             setRemoteStream(remoteStream)
                             dispatch({ type: "SET_PEER", payload: { remoteStream } })
@@ -97,7 +99,11 @@ export const usePeer = (myId, dispatch, state) => {
             console.log("Existing tracks after adding: ", updatedTracks)
         })
         conn.on("data", (data) => {
-            setMessage(data)
+            if (data.type === "stopScreen") {
+                stopSharedScreen()
+            } else {
+                setMessage(data)
+            }
         })
         conn.on("close", () => {
             disconnect()
@@ -116,6 +122,8 @@ export const usePeer = (myId, dispatch, state) => {
                     /* if (remoteScreenRef.current) {
                         remoteScreenRef.current.srcObject = remoteStream
                     } */
+                } else if (data.type === "stopScreen") {
+                    stopSharedScreen()
                 } else {
                     console.log("Stream received on call")
                     setRemoteStream(remoteStream)
@@ -160,6 +168,13 @@ export const usePeer = (myId, dispatch, state) => {
         if (conn) conn.close()
         setRemoteStream(null)
         dispatch({ type: "SET_PEER", payload: { remoteStream: null, peer: null, conn: null, call: null } })
+    }
+
+    const stopSharedScreen = () => {
+        if (state.tempStream) {
+            state.tempStream.getTracks().forEach((track) => track.stop())
+        }
+        dispatch({ type: "SET_TEMP_STREAM", payload: null })
     }
 
     return { peer, message, connect, disconnect }

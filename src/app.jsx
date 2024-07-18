@@ -23,44 +23,33 @@ export function App() {
                     if (remoteScreenRef.current) {
                         remoteScreenRef.current.srcObject = remoteStream
                     }
-                    dispatch({ type: 'SET_CALL', payload: outgoingCall })
+                    dispatch({ type: "SET_CALL", payload: outgoingCall })
                 })
             }
-
-            /* if (state.call && state.call.peerConnection) {
-                console.log("PeerConnection established: ", state.call.peerConnection)
-                const senders = state.call.peerConnection.getSenders()
-                console.log("Senders: ", senders)
-                const videoSender = senders.find(sender => sender.track && sender.track.kind === 'video')
-                if (videoSender) {
-                    console.log("Video sender found: ", videoSender)
-                    videoSender.replaceTrack(screenStream.getVideoTracks()[0])
-                } else {
-                    console.error("No video sender found in the peer connection.")
-                }
-            } else {
-                console.error("PeerConnection or call not established.")
-            } */
         } catch (error) {
             console.error("Error starting screen share:", error)
         }
     }
 
+    const closeScreenShare = () => {
+        if (state.tempStream) {
+            // Stop all tracks of the screen share stream
+            state.tempStream.getTracks().forEach((track) => track.stop())
+        }
+
+        if (state.conn) {
+            // Notify the remote peer to stop screen sharing
+            state.conn.send({ type: "stopScreen" })
+        }
+
+        dispatch({ type: "SET_TEMP_STREAM", payload: null })
+    }
+
     useEffect(() => {
-        if(state.remoteStream){
+        if (state.remoteStream) {
             console.log("Remote Stream: ", state.remoteStream)
         }
     }, [state.remoteStream])
-
-   /*  useEffect(() => {
-        if (state.tempStream && state.call) {
-            state.call.peerConnection.getSenders().forEach((sender) => {
-                if (sender.track && sender.track.kind === "video") {
-                    sender.replaceTrack(state.tempStream.getVideoTracks()[0])
-                }
-            })
-        }
-    }, [state.tempStream]) */
 
     return (
         <Context.Provider value={{ state, dispatch }}>
@@ -80,16 +69,30 @@ export function App() {
                     </div>
 
                     <div class="w-[600px] pb-4 pt-2 pr-4 h-full flex flex-col">
-                        <div className="flex justify-around w-full p-2">
+                        <div className="flex justify-center gap-2 w-full p-2">
                             <button
                                 className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
                                 onClick={startScreenShare}
                             >
                                 Share Screen
                             </button>
+                            <button
+                                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                                onClick={closeScreenShare}
+                            >
+                                Close
+                            </button>
                         </div>
-                        <div class="grow border border-gray-400 rounded">
-                            <Video stream={state.tempStream} />
+                        <div>
+                            <div class="flex justify-start gap-4">
+                                <div class="">Dashboard</div>
+                                <div class="">Screen</div>
+                                <div>Whiteboard</div>
+                                <div>Documents</div>
+                            </div>
+                            <div class="grow border border-gray-400 rounded">
+                                <Video stream={state.tempStream} />
+                            </div>
                         </div>
                     </div>
                 </div>
