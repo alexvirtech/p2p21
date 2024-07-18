@@ -65,7 +65,7 @@ export function App() {
                     <h1 class="text-2xl flex justify-center py-4">Communicator</h1>
                 </div>
 
-                <div class="grow flex justify-start gap-0">
+                <div class="grow flex justify-center gap-0">
                     <div class="p-4 grow flex flex-col min-h-0 max-w-[420px]">
                         <Caller />
                         <div class="grid grid-cols-2 gap-2 py-4 h-[200px]">
@@ -75,7 +75,7 @@ export function App() {
                         <Chat />
                     </div>
 
-                    <div class="w-full py-4 pr-4 flex flex-col">
+                    <div class="w-full py-4 pr-4 flex flex-col max-w-[1000px]">
                         <div class="flex justify-start gap-4">
                             {tabs.map((t) => (
                                 <button
@@ -86,7 +86,7 @@ export function App() {
                                 </button>
                             ))}
                         </div>
-                        <div class="grow border border-gray-400 rounded p-4 max-w-[1000px]">
+                        <div class="grow border border-gray-400 rounded p-4">
                                 <Video stream={state.tempStream} />                            
                         </div>
                     </div>
