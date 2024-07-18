@@ -4,12 +4,13 @@ export default function Video ({ stream, name }) {
     const videoRef = useRef(null)
 
     useEffect(() => {
-        if (videoRef.current && stream) {
+        if (videoRef.current) {
             videoRef.current.srcObject = stream
         }
     }, [stream])
 
     return <div>
-            <div>{name}</div><video ref={videoRef} autoPlay playsInline muted />
+            {name && <div>{name}</div>}
+            <video ref={videoRef} autoPlay playsInline muted/>
         </div>
 }

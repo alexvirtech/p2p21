@@ -1,4 +1,4 @@
-import { useReducer, useEffect } from "preact/hooks"
+import { useReducer, useState, useEffect } from "preact/hooks"
 import { Context } from "./utils/context"
 import { InitState, reducer } from "./utils/reducer"
 import Chat from "./components/chat"
@@ -10,6 +10,8 @@ import { usePeer } from "./hooks/usePeer"
 export function App() {
     const [state, dispatch] = useReducer(reducer, InitState)
     const { peer, connect, disconnect } = usePeer(null, dispatch, state)
+    const tabs = ["Dashboard", "Screen", "Whiteboard", "Documents"]
+    const [tab, setTab] = useState(tabs[0])
 
     const startScreenShare = async () => {
         try {
@@ -20,9 +22,6 @@ export function App() {
                 state.conn.send({ type: "screen" }) // Send a message indicating screen share
                 const outgoingCall = state.peer.call(state.conn.peer, screenStream)
                 outgoingCall.on("stream", (remoteStream) => {
-                    if (remoteScreenRef.current) {
-                        remoteScreenRef.current.srcObject = remoteStream
-                    }
                     dispatch({ type: "SET_CALL", payload: outgoingCall })
                 })
             }
@@ -51,6 +50,14 @@ export function App() {
         }
     }, [state.remoteStream])
 
+    useEffect(() => {
+        if (tab === "Screen") {
+            startScreenShare()
+        } else {
+            closeScreenShare()
+        }
+    }, [tab])
+
     return (
         <Context.Provider value={{ state, dispatch }}>
             <div class="h-[100vh] flex flex-col">
@@ -68,31 +75,19 @@ export function App() {
                         <Chat />
                     </div>
 
-                    <div class="w-[600px] pb-4 pt-2 pr-4 h-full flex flex-col">
-                        <div className="flex justify-center gap-2 w-full p-2">
-                            <button
-                                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                                onClick={startScreenShare}
-                            >
-                                Share Screen
-                            </button>
-                            <button
-                                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                                onClick={closeScreenShare}
-                            >
-                                Close
-                            </button>
+                    <div class="w-full py-4 pr-4 flex flex-col">
+                        <div class="flex justify-start gap-4">
+                            {tabs.map((t) => (
+                                <button
+                                    onClick={() => setTab(t)}
+                                    class={"font-bold " + (t === tab ? "text-gray-700" : "text-blue-500 hover:underline")}
+                                >
+                                    {t}
+                                </button>
+                            ))}
                         </div>
-                        <div>
-                            <div class="flex justify-start gap-4">
-                                <div class="">Dashboard</div>
-                                <div class="">Screen</div>
-                                <div>Whiteboard</div>
-                                <div>Documents</div>
-                            </div>
-                            <div class="grow border border-gray-400 rounded">
-                                <Video stream={state.tempStream} />
-                            </div>
+                        <div class="grow border border-gray-400 rounded p-4 max-w-[1000px]">
+                                <Video stream={state.tempStream} />                            
                         </div>
                     </div>
                 </div>
