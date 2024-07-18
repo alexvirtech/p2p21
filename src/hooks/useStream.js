@@ -1,15 +1,17 @@
-import {useState,useEffect} from 'preact/hooks'
+import { useState, useEffect } from "preact/hooks"
 
-export const useStream = () => {
+export const useStream = (type = "video") => {
     const [localStream, setLocalStream] = useState(null)
 
     useEffect(() => {
-        init()
-    }, [])
-    
-    const init = async () => {
+        initStream()
+    }, [type])
+
+    const initStream = async () => {
         try {
-            const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+            const stream = type === "video"
+                ? await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+                : await navigator.mediaDevices.getDisplayMedia({ video: true })
             setLocalStream(stream)
         } catch (error) {
             console.error("Error accessing media devices.", error)

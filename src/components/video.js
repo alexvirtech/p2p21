@@ -1,15 +1,20 @@
+import { useRef, useEffect } from "preact/hooks"
 
-export default function Video({ stream, name }) {
+const Video = ({ stream, name }) => {
+    const videoRef = useRef(null)
+
+    useEffect(() => {
+        if (videoRef.current && stream) {
+            videoRef.current.srcObject = stream
+        }
+    }, [stream])
+
     return (
-        <div class="w-full border border-gray-400 p-2 rounded h-full flex flex-col items-center justify-center">
-            {stream ? (
-                <video autoplay muted srcObject={stream} class="w-full h-full object-cover"></video>
-            ) : (
-                <div class="flex flex-col items-center justify-center w-full h-full">
-                    <div>{name}</div>
-                    <div class="text-sm">is not connected</div>
-                </div>
-            )}
+        <div className="video-container">
+            <h2>{name}</h2>
+            <video ref={videoRef} autoPlay playsInline muted />
         </div>
     )
 }
+
+export default Video

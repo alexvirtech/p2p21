@@ -1,14 +1,49 @@
-import { useState, useEffect, useRef, useReducer } from "preact/hooks"
+import { useReducer, useEffect } from "preact/hooks"
 import { Context } from "./utils/context"
 import { InitState, reducer } from "./utils/reducer"
 import Chat from "./components/chat"
 import Video from "./components/video"
 import Status from "./components/status"
 import Caller from "./components/caller"
-import Screen from "./components/screen"
+import { usePeer } from "./hooks/usePeer"
 
 export function App() {
     const [state, dispatch] = useReducer(reducer, InitState)
+    const { peer, connect, disconnect } = usePeer(null, dispatch, state)
+
+    const startScreenShare = async () => {
+        try {
+            const screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true })
+            dispatch({ type: "SET_TEMP_STREAM", payload: screenStream })
+
+            if (state.call && state.call.peerConnection) {
+                console.log("PeerConnection established: ", state.call.peerConnection)
+                const senders = state.call.peerConnection.getSenders()
+                console.log("Senders: ", senders)
+                const videoSender = senders.find(sender => sender.track && sender.track.kind === 'video')
+                if (videoSender) {
+                    console.log("Video sender found: ", videoSender)
+                    videoSender.replaceTrack(screenStream.getVideoTracks()[0])
+                } else {
+                    console.error("No video sender found in the peer connection.")
+                }
+            } else {
+                console.error("PeerConnection or call not established.")
+            }
+        } catch (error) {
+            console.error("Error starting screen share:", error)
+        }
+    }
+
+    useEffect(() => {
+        if (state.tempStream && state.call) {
+            state.call.peerConnection.getSenders().forEach(sender => {
+                if (sender.track && sender.track.kind === "video") {
+                    sender.replaceTrack(state.tempStream.getVideoTracks()[0])
+                }
+            })
+        }
+    }, [state.tempStream])
 
     return (
         <Context.Provider value={{ state, dispatch }}>
@@ -18,7 +53,6 @@ export function App() {
                 </div>
 
                 <div class="grow flex justify-start gap-0">
-                    {/* <div class="flex flex-col"> */}
                     <div class="p-4 grow flex flex-col min-h-0 max-w-[420px]">
                         <Caller />
                         <div class="grid grid-cols-2 gap-2 py-4 h-[200px]">
@@ -26,23 +60,19 @@ export function App() {
                             <Video stream={state.remoteStream} name={"User 2"} />
                         </div>
                         <Chat />
-
-                        {/*  <div class="grow">
-                                   
-                                </div> */}
                     </div>
 
-                    {/* </div> */}
                     <div class="w-[600px] pb-4 pt-2 pr-4 h-full flex flex-col">
-                        <div class="flex justify-start gap-0">
-                            <div class="border border-gray-400 rounded-t py-1 px-4">Dashboard</div>
-                            <div class="border-t border-l border-r border-gray-400 rounded-t py-1 px-4">Screen</div>
-                            <div class="border border-gray-400 rounded-t py-1 px-4">Whiteboard</div>
-                            <div class="border border-gray-400 rounded-t py-1 px-4">Documents</div>
-                            <div class="grow border-b border-gray-400">&nbsp;</div>
+                        <div className="flex justify-around w-full p-2">
+                            <button
+                                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                                onClick={startScreenShare}
+                            >
+                                Share Screen
+                            </button>
                         </div>
-                        <div class="grow border-b border-l border-r border-gray-400 rounded-b">
-                            <Screen />
+                        <div class="grow border border-gray-400 rounded">
+                            <Video stream={state.tempStream} />
                         </div>
                     </div>
                 </div>

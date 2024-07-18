@@ -5,7 +5,7 @@ import { usePeer } from "../hooks/usePeer"
 export default function Caller() {
     const { state, dispatch } = useContext(Context)
     const [recId, setRecId] = useState("")
-    const { peer, message, connect, disconnect } = usePeer(null)
+    const { peer, message, connect, disconnect } = usePeer(null,dispatch,state)
 
     useEffect(() => {
         return () => {
