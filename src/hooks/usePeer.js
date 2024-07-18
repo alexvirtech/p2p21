@@ -25,17 +25,23 @@ export const usePeer = (myId, dispatch, state) => {
         try {
             const pr = myId ? new Peer(myId, peerConfig) : new Peer(peerConfig)
             setPeer(pr)
-            pr.on("open", id => {
+            pr.on("open", (id) => {
                 dispatch({ type: "SET_PEER", payload: { peer: pr } })
                 console.log("Peer ID:", id)
             })
-            pr.on("call", incomingCall => {
+            pr.on("call", (incomingCall) => {
                 console.log("Incoming call")
                 dispatch({ type: "SET_PEER", payload: { call: incomingCall } })
                 incomingCall.answer(localStream)
-                incomingCall.on("stream", remoteStream => {
-                    setRemoteStream(remoteStream)
-                    dispatch({ type: "SET_PEER", payload: { remoteStream } })
+                incomingCall.on("stream", (remoteStream) => {
+                    conn.on("data", (data) => {
+                        if (data && data.type === "screen") {
+                            dispatch({ type: "SET_TEMP_STREAM", payload: remoteStream })                            
+                        } else {
+                            setRemoteStream(remoteStream)
+                            dispatch({ type: "SET_PEER", payload: { remoteStream } })
+                        }
+                    })
                 })
                 incomingCall.peerConnection.ontrack = (event) => {
                     console.log("Track event received on incoming call")
@@ -44,10 +50,10 @@ export const usePeer = (myId, dispatch, state) => {
                     dispatch({ type: "SET_PEER", payload: { remoteStream: stream } })
                 }
             })
-            pr.on("connection", connection => {
+            pr.on("connection", (connection) => {
                 setConn(connection)
             })
-            pr.on("error", err => {
+            pr.on("error", (err) => {
                 console.error("Peer error:", err)
             })
         } catch (error) {
@@ -71,10 +77,10 @@ export const usePeer = (myId, dispatch, state) => {
                 dispatch({ type: "SET_PEER", payload: { remoteStream: stream } })
             }
 
-            const existingTracks = cn.peerConnection.getSenders().map(sender => sender.track?.kind)
+            const existingTracks = cn.peerConnection.getSenders().map((sender) => sender.track?.kind)
             console.log("Existing tracks before adding: ", existingTracks)
 
-            localStream.getTracks().forEach(track => {
+            localStream.getTracks().forEach((track) => {
                 if (!existingTracks.includes(track.kind)) {
                     console.log(`Adding track: ${track.kind}`)
                     try {
@@ -87,31 +93,40 @@ export const usePeer = (myId, dispatch, state) => {
                 }
             })
 
-            const updatedTracks = cn.peerConnection.getSenders().map(sender => sender.track?.kind)
+            const updatedTracks = cn.peerConnection.getSenders().map((sender) => sender.track?.kind)
             console.log("Existing tracks after adding: ", updatedTracks)
         })
-        conn.on("data", data => {
+        conn.on("data", (data) => {
             setMessage(data)
         })
         conn.on("close", () => {
             disconnect()
         })
-        conn.on("error", err => {
+        conn.on("error", (err) => {
             console.error("Connection error:", err)
         })
     }, [conn])
 
     useEffect(() => {
         if (!call) return
-        call.on("stream", remoteStream => {
-            console.log("Stream received on call")
-            setRemoteStream(remoteStream)
-            dispatch({ type: "SET_PEER", payload: { remoteStream } })
+        call.on("stream", (remoteStream) => {
+            conn.on("data", (data) => {
+                if (data && data.type === "screen") {
+                    dispatch({ type: "SET_TEMP_STREAM", payload: remoteStream })
+                    /* if (remoteScreenRef.current) {
+                        remoteScreenRef.current.srcObject = remoteStream
+                    } */
+                } else {
+                    console.log("Stream received on call")
+                    setRemoteStream(remoteStream)
+                    dispatch({ type: "SET_PEER", payload: { remoteStream } })
+                }
+            })
         })
         call.on("close", () => {
             disconnect()
         })
-        call.on("error", err => {
+        call.on("error", (err) => {
             console.error("Call error:", err)
         })
         call.peerConnection.ontrack = (event) => {
@@ -123,8 +138,8 @@ export const usePeer = (myId, dispatch, state) => {
 
         // Ensure tracks are added to the call
         if (localStream) {
-            localStream.getTracks().forEach(track => {
-                const sender = call.peerConnection.getSenders().find(s => s.track?.kind === track.kind)
+            localStream.getTracks().forEach((track) => {
+                const sender = call.peerConnection.getSenders().find((s) => s.track?.kind === track.kind)
                 if (!sender) {
                     console.log(`Adding missing track: ${track.kind}`)
                     call.peerConnection.addTrack(track, localStream)
@@ -135,7 +150,7 @@ export const usePeer = (myId, dispatch, state) => {
         }
     }, [call, localStream])
 
-    const connect = recId => {
+    const connect = (recId) => {
         const connection = peer.connect(recId)
         setConn(connection)
     }

@@ -16,7 +16,18 @@ export function App() {
             const screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true })
             dispatch({ type: "SET_TEMP_STREAM", payload: screenStream })
 
-            if (state.call && state.call.peerConnection) {
+            if (state.peer && state.conn) {
+                state.conn.send({ type: "screen" }) // Send a message indicating screen share
+                const outgoingCall = state.peer.call(state.conn.peer, screenStream)
+                outgoingCall.on("stream", (remoteStream) => {
+                    if (remoteScreenRef.current) {
+                        remoteScreenRef.current.srcObject = remoteStream
+                    }
+                    dispatch({ type: 'SET_CALL', payload: outgoingCall })
+                })
+            }
+
+            /* if (state.call && state.call.peerConnection) {
                 console.log("PeerConnection established: ", state.call.peerConnection)
                 const senders = state.call.peerConnection.getSenders()
                 console.log("Senders: ", senders)
@@ -29,21 +40,27 @@ export function App() {
                 }
             } else {
                 console.error("PeerConnection or call not established.")
-            }
+            } */
         } catch (error) {
             console.error("Error starting screen share:", error)
         }
     }
 
     useEffect(() => {
+        if(state.remoteStream){
+            console.log("Remote Stream: ", state.remoteStream)
+        }
+    }, [state.remoteStream])
+
+   /*  useEffect(() => {
         if (state.tempStream && state.call) {
-            state.call.peerConnection.getSenders().forEach(sender => {
+            state.call.peerConnection.getSenders().forEach((sender) => {
                 if (sender.track && sender.track.kind === "video") {
                     sender.replaceTrack(state.tempStream.getVideoTracks()[0])
                 }
             })
         }
-    }, [state.tempStream])
+    }, [state.tempStream]) */
 
     return (
         <Context.Provider value={{ state, dispatch }}>

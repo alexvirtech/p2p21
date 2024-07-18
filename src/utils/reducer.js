@@ -11,7 +11,11 @@ export const InitState = {
 export const reducer = (state, action) => {
     switch (action.type) {
         case "SET_PEER":
-            return { ...state, ...action.payload }
+            if (action.payload.remoteStream && state.remoteStream && state.remoteStream.id !== action.payload.remoteStream.id) {
+                return { ...state, tempStream:action.payload.remoteStream }
+            } else {
+                return { ...state, ...action.payload }
+            }
         case "SET_CALL":
             return { ...state, call: action.payload }
         case "ADD_MESSAGE":
