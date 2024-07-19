@@ -34,16 +34,8 @@ export const usePeer = (myId, dispatch, state) => {
                 dispatch({ type: "SET_PEER", payload: { call: incomingCall } })
                 incomingCall.answer(localStream)
                 incomingCall.on("stream", (remoteStream) => {
-                    conn.on("data", (data) => {
-                        if (data && data.type === "screen") {
-                            dispatch({ type: "SET_TEMP_STREAM", payload: remoteStream })
-                        } else if (data.type === "stopScreen") {
-                            stopSharedScreen()                        
-                        } else {
-                            setRemoteStream(remoteStream)
-                            dispatch({ type: "SET_PEER", payload: { remoteStream } })
-                        }
-                    })
+                    setRemoteStream(remoteStream)
+                    dispatch({ type: "SET_PEER", payload: { remoteStream } })
                 })
                 incomingCall.peerConnection.ontrack = (event) => {
                     console.log("Track event received on incoming call")
@@ -54,6 +46,9 @@ export const usePeer = (myId, dispatch, state) => {
             })
             pr.on("connection", (connection) => {
                 setConn(connection)
+                connection.on("data", (data) => {
+                    handleData(data)
+                })
             })
             pr.on("error", (err) => {
                 console.error("Peer error:", err)
@@ -99,11 +94,7 @@ export const usePeer = (myId, dispatch, state) => {
             console.log("Existing tracks after adding: ", updatedTracks)
         })
         conn.on("data", (data) => {
-            if (data.type === "stopScreen") {
-                stopSharedScreen()
-            } else {
-                setMessage(data)
-            }
+            handleData(data)
         })
         conn.on("close", () => {
             disconnect()
@@ -116,20 +107,8 @@ export const usePeer = (myId, dispatch, state) => {
     useEffect(() => {
         if (!call) return
         call.on("stream", (remoteStream) => {
-            conn.on("data", (data) => {
-                if (data && data.type === "screen") {
-                    dispatch({ type: "SET_TEMP_STREAM", payload: remoteStream })
-                    /* if (remoteScreenRef.current) {
-                        remoteScreenRef.current.srcObject = remoteStream
-                    } */
-                } else if (data.type === "stopScreen") {
-                    stopSharedScreen()
-                } else {
-                    console.log("Stream received on call")
-                    setRemoteStream(remoteStream)
-                    dispatch({ type: "SET_PEER", payload: { remoteStream } })
-                }
-            })
+            setRemoteStream(remoteStream)
+            dispatch({ type: "SET_PEER", payload: { remoteStream } })
         })
         call.on("close", () => {
             disconnect()
@@ -175,6 +154,14 @@ export const usePeer = (myId, dispatch, state) => {
             state.tempStream.getTracks().forEach((track) => track.stop())
         }
         dispatch({ type: "SET_TEMP_STREAM", payload: null })
+    }
+
+    const handleData = (data) => {
+        if (data.type === "stopScreen") {
+            stopSharedScreen()
+        } else if (data.type === "set_tab") {
+            dispatch({ type: "SET_TAB", payload: { tab: data.payload, isReceiver: true } })
+        }
     }
 
     return { peer, message, connect, disconnect }
