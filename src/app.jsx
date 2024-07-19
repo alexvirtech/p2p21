@@ -5,6 +5,7 @@ import { usePeer } from "./hooks/usePeer"
 import { useControl } from "./hooks/useControl"
 import Video from "./components/video"
 import Whiteboard from "./components/whiteboard"
+import Documents from "./components/documents"
 
 export function App() {
     const [state, dispatch] = useReducer(reducer, InitState)
@@ -60,6 +61,7 @@ export function App() {
         <Layout state={state} dispatch={dispatch}>
             {state.tab === "Screen" && <Video stream={state.tempStream} />}
             {state.tab === "Whiteboard" && <Whiteboard />}
+            {state.tab === "Documents" && <Documents />}
             {/* {isControlled && <button onClick={passControl}>Pass Control</button>} */}
         </Layout>
     )
