@@ -4,7 +4,7 @@ import { fileURLToPath } from 'url'
 import documentsApi from './api/documentsApi.js' // Ensure the extension .js is included
 
 const app = express()
-const PORT = process.env.PORT || 5000
+const PORT = process.env.PORT || 5005
 
 app.use(express.json())
 app.use('/api/documents', documentsApi)
