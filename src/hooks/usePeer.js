@@ -47,7 +47,7 @@ export const usePeer = (myId, dispatch, state) => {
             pr.on("connection", (connection) => {
                 setConn(connection)
                 connection.on("data", (data) => {
-                    handleData(data)
+                    //handleData(data)
                 })
             })
             pr.on("error", (err) => {
@@ -161,6 +161,8 @@ export const usePeer = (myId, dispatch, state) => {
             stopSharedScreen()
         } else if (data.type === "set_tab") {
             dispatch({ type: "SET_TAB", payload: { tab: data.payload, isReceiver: true } })
+        } else if(data.type === 'msg'){
+            dispatch({ type: "ADD_MESSAGE", payload: {message:data.payload,isMine: false} })
         }
     }
 

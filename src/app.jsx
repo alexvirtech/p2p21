@@ -1,13 +1,10 @@
 import { useReducer, useEffect } from "preact/hooks"
-import { Context } from "./utils/context"
+import Layout from "./components/layout"
 import { InitState, reducer } from "./utils/reducer"
-import Chat from "./components/chat"
-import Video from "./components/video"
-import Status from "./components/status"
-import Caller from "./components/caller"
 import { usePeer } from "./hooks/usePeer"
-import Whiteboard from "./components/whiteboard"
 import { useControl } from "./hooks/useControl"
+import Video from "./components/video"
+import Whiteboard from "./components/whiteboard"
 
 export function App() {
     const [state, dispatch] = useReducer(reducer, InitState)
@@ -60,53 +57,10 @@ export function App() {
     }, [state.tab])
 
     return (
-        <Context.Provider value={{ state, dispatch }}>
-            <div class="h-[100vh] flex flex-col">
-                <div class="border-b border-gray-500 px-4">
-                    <h1 class="text-2xl flex justify-center py-4">Communicator</h1>
-                </div>
-
-                <div class="grow flex justify-center gap-0">
-                    <div class="p-4 grow flex flex-col min-h-0 max-w-[420px]">
-                        <Caller />
-                        <div class="grid grid-cols-2 gap-2 py-4 h-[200px]">
-                            <div class="border border-gray-400 rounded p-2 pt-0">
-                                <Video stream={state.localStream} name="my video" />
-                            </div>
-                            <div class="border border-gray-400 rounded p-2 pt-0">
-                                {state.remoteStream ? (
-                                    <Video stream={state.remoteStream} name={"User 2"} />
-                                ) : (
-                                    <div>not connected</div>
-                                )}
-                            </div>
-                        </div>
-                        <Chat />
-                    </div>
-
-                    <div class="w-full py-4 pr-4 flex flex-col max-w-[1000px]">
-                        <div class="flex justify-start gap-4">
-                            {state.tabs.map((t) => (
-                                <button
-                                    onClick={() => dispatch({ type: "SET_TAB", payload: { tab: t } })}
-                                    class={"font-bold " + (t === state.tab ? "text-gray-700" : "text-blue-500 hover:underline")}
-                                >
-                                    {t}
-                                </button>
-                            ))}
-                        </div>
-                        <div class="grow border border-gray-400 rounded p-4">
-                            {state.tab === "Screen" && <Video stream={state.tempStream} />}
-                            {state.tab === "Whiteboard" && <Whiteboard />}
-                            {/*  {isControlled && <button onClick={passControl}>Pass Control</button>} */}
-                        </div>
-                    </div>
-                </div>
-
-                <div class="p-4 border-t border-gray-400">
-                    <Status isConnected={state.remoteStream} />
-                </div>
-            </div>
-        </Context.Provider>
+        <Layout state={state} dispatch={dispatch}>
+            {state.tab === "Screen" && <Video stream={state.tempStream} />}
+            {state.tab === "Whiteboard" && <Whiteboard />}
+            {/* {isControlled && <button onClick={passControl}>Pass Control</button>} */}
+        </Layout>
     )
 }
