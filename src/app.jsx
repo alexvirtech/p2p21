@@ -6,10 +6,13 @@ import Video from "./components/video"
 import Status from "./components/status"
 import Caller from "./components/caller"
 import { usePeer } from "./hooks/usePeer"
+import Whiteboard from "./components/whiteboard"
+import { useControl } from "./hooks/useControl"
 
 export function App() {
     const [state, dispatch] = useReducer(reducer, InitState)
     const { peer, connect, disconnect } = usePeer(null, dispatch, state)
+    const { isControlled, passControl } = useControl()
     const tabs = ["Dashboard", "Screen", "Whiteboard", "Documents"]
     const [tab, setTab] = useState(tabs[0])
 
@@ -69,8 +72,12 @@ export function App() {
                     <div class="p-4 grow flex flex-col min-h-0 max-w-[420px]">
                         <Caller />
                         <div class="grid grid-cols-2 gap-2 py-4 h-[200px]">
-                            <Video stream={state.localStream} name="my video" />
-                            <Video stream={state.remoteStream} name={"User 2"} />
+                            <div class="border border-gray-400 rounded p-2 pt-0">
+                                <Video stream={state.localStream} name="my video" />
+                            </div>
+                            <div class="border border-gray-400 rounded p-2 pt-0">
+                                {state.remoteStream ? <Video stream={state.remoteStream} name={"User 2"} /> : <div>not connected</div>}
+                            </div>
                         </div>
                         <Chat />
                     </div>
@@ -87,7 +94,9 @@ export function App() {
                             ))}
                         </div>
                         <div class="grow border border-gray-400 rounded p-4">
-                                <Video stream={state.tempStream} />                            
+                            {tab==='Screen' && <Video stream={state.tempStream} />}
+                            {tab==='Whiteboard' && <Whiteboard />}
+                           {/*  {isControlled && <button onClick={passControl}>Pass Control</button>} */}
                         </div>
                     </div>
                 </div>

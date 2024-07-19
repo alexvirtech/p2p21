@@ -6,16 +6,28 @@
         //- connection, 
         //- status
         - group chat
-    - custom hooks 
-        - peerManger
+    //- custom hooks 
+        //- peerManger
     - persistance 
         - save in localStorage, restore connection on page refresh
 - collaboration tools
-    - screen
+    - dashboard
+        - group creation (if not)
+        - group details (if created)
+        - group and individual calls
+        - invite guest        
+        - assets (for group - selection)
+            - screen
+            - whiteboard
+            - documents (based on google docs)
+            - tasks
+            - project (card with the project description, links, gant)
+    //- screen
     - whiteboard
     - group documents
+        - explorer
+        - open doc, sheet (others ?)
 
 *** version for Braude ***
-6d4c8828aebfcbd3861440069af00ce9b7080423
-6d4c882
-07-17-24, 16:32
+- user creates a group of users for communications in the frame of the project
+- the project card will be shared with a lecturer (separate module for lecturers)
