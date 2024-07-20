@@ -1,8 +1,12 @@
 import { google } from "googleapis"
 
 const auth = new google.auth.GoogleAuth({
-    keyFile: "config/extrasafe-429914-032ac06e7584.json", // Ensure the path is correct
-    scopes: ["https://www.googleapis.com/auth/drive"],
+    keyFile: "config/extrasafe-429914-a7e0a51d285a.json", // Ensure this path is correct
+    scopes: ["https://www.googleapis.com/auth/drive"], // Ensure this scope is correct
 })
 
-export { auth } // Ensure this line correctly exports the auth object
+auth.getClient().catch((error) => {
+    console.error("Error getting client:", error)
+})
+
+export default auth 

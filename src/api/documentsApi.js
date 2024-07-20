@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const API_URL = '/api/documents'
+const API_URL = 'http://localhost:5005/api/documents' // Ensure this URL matches your server configuration
 
 export const fetchFiles = async (folderId) => {
     const response = await axios.get(`${API_URL}/files`, { params: { folderId } })

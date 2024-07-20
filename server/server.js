@@ -1,11 +1,13 @@
 import express from 'express'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import cors from 'cors' // Import the cors package
 import documentsApi from './api/documentsApi.js' // Ensure the extension .js is included
 
 const app = express()
 const PORT = process.env.PORT || 5005
 
+app.use(cors()) // Enable CORS for all routes
 app.use(express.json())
 app.use('/api/documents', documentsApi)
 

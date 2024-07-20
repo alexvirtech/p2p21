@@ -1,11 +1,24 @@
 import { Router } from 'express'
 import { google } from 'googleapis'
-import { auth } from '../googleAuth.js'
+import auth from '../googleAuth.js'
 
 const router = Router()
 const drive = google.drive({ version: 'v3', auth: await auth.getClient() })
+const ROOT_FOLDER_ID = '12A9SujImS-Xby8MHzyWTEE-7MvgH7EpF' // Replace with your actual root folder ID
 
-const ROOT_FOLDER_ID = 'https://drive.google.com/drive/folders/12A9SujImS-Xby8MHzyWTEE-7MvgH7EpF?usp=drive_link' // Replace with your root folder ID
+// Replace 'client_email' with your actual service account email
+const SERVICE_ACCOUNT_EMAIL = 'extrasafe-files@extrasafe-429914.iam.gserviceaccount.com'
+//'your-service-account-email@your-project-id.iam.gserviceaccount.com'
+
+const addPermission = async (fileId) => {
+    await drive.permissions.create({
+        fileId,
+        requestBody: {
+            role: 'writer',
+            type: 'anyone',
+        },
+    })
+}
 
 router.get('/files', async (req, res) => {
     const { folderId } = req.query
@@ -29,6 +42,7 @@ router.post('/createFolder', async (req, res) => {
         resource: fileMetadata,
         fields: 'id, name',
     })
+    await addPermission(response.data.id) // Add permission for service account
     res.json(response.data)
 })
 
@@ -44,6 +58,7 @@ router.post('/createDocument', async (req, res) => {
         resource: fileMetadata,
         fields: 'id, name, webViewLink',
     })
+    await addPermission(response.data.id) // Add permission for service account
     res.json(response.data)
 })
 
@@ -59,6 +74,7 @@ router.post('/createSheet', async (req, res) => {
         resource: fileMetadata,
         fields: 'id, name, webViewLink',
     })
+    await addPermission(response.data.id) // Add permission for service account
     res.json(response.data)
 })
 
