@@ -133,6 +133,43 @@ const Documents = () => {
         }
     }, [state.conn])
 
+    const renderFileIcon = (mimeType) => {
+        switch (mimeType) {
+            case 'application/vnd.google-apps.folder':
+                return (
+                    <svg className="w-6 h-6 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 7l1-2a2 2 0 012-2h3l2 2h6a2 2 0 012 2v2m-2 10a2 2 0 002-2V7a2 2 0 00-2-2h-6l-2-2H6a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2v-4H3v4a2 2 0 002 2h14z"></path>
+                    </svg>
+                )
+            case 'application/vnd.google-apps.document':
+                return (
+                    <svg className="w-6 h-6 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h9l7 7v9a2 2 0 01-2 2z"></path>
+                    </svg>
+                )
+            case 'application/vnd.google-apps.spreadsheet':
+                return (
+                    <svg className="w-6 h-6 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m-6-8h6m2 12H7a2 2 0 01-2-2V5a2 2 0 012-2h6l6 6v9a2 2 0 01-2 2z"></path>
+                    </svg>
+                )
+            default:
+                return (
+                    <svg className="w-6 h-6 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 11v2m0-6v2m0 4h.01M12 5h.01M17 16H7a2 2 0 00-2 2v2a2 2 0 002 2h10a2 2 0 002-2v-2a2 2 0 00-2-2z"></path>
+                    </svg>
+                )
+        }
+    }
+
+    const renderFileTree = (files) => {
+        return files.map((file) => (
+            <div key={file.id} onClick={() => file.mimeType === 'application/vnd.google-apps.folder' ? openFolder(file.id) : handleOpenFile(file.id)} className="cursor-pointer p-2 hover:bg-gray-200 flex items-center">
+                {renderFileIcon(file.mimeType)} {file.name}
+            </div>
+        ))
+    }
+
     return (
         <div className="flex flex-col h-full overflow-hidden">
             {view === "explorer" && (
@@ -144,11 +181,9 @@ const Documents = () => {
                     </div>
                     <div className="flex-1 overflow-y-auto p-2">
                         {Array.isArray(files) && files.length > 0 ? (
-                            files.map((file) => (
-                                <div key={file.id} onClick={() => file.mimeType === 'application/vnd.google-apps.folder' ? openFolder(file.id) : handleOpenFile(file.id)} className="cursor-pointer p-2 hover:bg-gray-200">
-                                    {file.name}
-                                </div>
-                            ))
+                            <div className="file-tree">
+                                {renderFileTree(files)}
+                            </div>
                         ) : (
                             <div>No files or folders</div>
                         )}
