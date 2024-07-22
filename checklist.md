@@ -1,32 +1,31 @@
-*** 16/07 ***
-- refactoring
-    - components 
-        //- chat, 
-        //- video, 
-        //- connection, 
-        //- status
-        - group chat
-    //- custom hooks 
-        //- peerManger
-    - persistance 
-        - save in localStorage, restore connection on page refresh
-- collaboration tools
-    - dashboard
-        - group creation (if not)
-        - group details (if created)
-        - group and individual calls
-        - invite guest        
-        - assets (for group - selection)
-            - screen
-            - whiteboard
-            - documents (based on google docs)
-            - tasks
-            - project (card with the project description, links, gant)
-    //- screen
-    - whiteboard
-    - group documents
-        - explorer
-        - open doc, sheet (others ?)
+*** 22/07 ***
+- flow and main content
+    - start page
+    - advanced
+    - ivite recipients
+    - join session
+    - create project 
+        - name, 
+        - private (default) or 
+        - public 
+            - guest access by defined google account        
+            - data syncronized with cloude db        
+        - collaboration tools 
+            - project, tasks (with comments), screen, whiteboard, documents            
+- account
+    - account data (view/edit)
+        - nickname
+        - password
+        - mnemonic, address, public and private key, 
+        - sync with cloud db or index DB only
+        - history
+        - contacts
+        - projects
+- persistance 
+    - save in index DB, restore connection on page refresh
+- public site for project guests 
+    - all projects (table)
+    - project page inc tasks, docs and links (git, vercel)
 
 *** version for Braude ***
 - user creates a group of users for communications in the frame of the project
