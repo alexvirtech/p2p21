@@ -20,6 +20,7 @@ export default function Braude() {
         const pr = localStorage.getItem("project")
         if (pr) {
             setProject(JSON.parse(pr))
+            setEdit(false)
         } else {
             setProject(newProject)
         }
