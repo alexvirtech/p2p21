@@ -1,7 +1,7 @@
 export default function Templates() {
     return (
         <div class="flex justify-start gap-4">
-            <div class="flex flex-col gap-1 h-[210px] w-[210px] border border-slate-400 rounded bg-slate-100 hover:bg-white cursor-pointer" title="Use empty template">
+            <div class="flex flex-col gap-1 h-[210px] w-[210px] border border-slate-400 hover:border-red-600 rounded bg-white cursor-pointer" title="Use empty template">
                 <div class="font-bold text-center">Empty layout</div>
                 <div class="w-[180px] h-[60px] mx-auto rounded bg-slate-300 p-4 flex justify-center items-center">
                     image
@@ -11,7 +11,7 @@ export default function Templates() {
                 </div>               
             </div>
 
-            <div class="flex flex-col gap-1 h-[210px] w-[210px] border border-slate-400 rounded bg-slate-100 hover:bg-white cursor-pointer" title="Use Braude project template">
+            <div class="flex flex-col gap-1 h-[210px] w-[210px] border border-slate-400 rounded  hover:border-red-600 bg-white cursor-pointer" title="Use Braude project template">
                 <div class="font-bold text-center">Braude project</div>
                 <div class="w-[180px] h-[60px] mx-auto rounded bg-slate-300 p-4 flex justify-center items-center">
                     image
