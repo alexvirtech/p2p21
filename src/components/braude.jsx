@@ -122,25 +122,24 @@ export default function Braude() {
                     </div>
                     <div>Github Repository</div>
                     <div>
-                        <a href={edit ? "#" : project.github} target={!edit && "_blank"}>
-                            <input
-                                disabled={!edit}
+                            {edit ? <input                                
                                 type="text"
-                                class={"border border-slate-300 rounded w-full py-0.5 px-2 " + (!edit && "text-blue-700 cursor-pointer hover:underline")}
+                                class={"border border-slate-300 rounded w-full py-0.5 px-2 "}
                                 value={project.github}
                                 onInput={(e) => setProject({ ...project, github: e.target.value })}
-                            />
-                        </a>
+                            /> : 
+                            <div class="border border-slate-300 rounded w-full py-0.5 px-2 bg-slate-50"><a href={project.github} target="_blank" class="text-blue-700 cursor-pointer hover:underline">{project.github}</a></div>}
                     </div>
                     <div>Hosting Address</div>
                     <div>
-                        <input
+                    {edit ? <input
                             disabled={!edit}
                             type="text"
                             class="border border-slate-300 rounded w-full py-0.5 px-2"
                             value={project.hosting}
                             onInput={(e) => setProject({ ...project, hosting: e.target.value })}
-                        />
+                        />: 
+                        <div class="border border-slate-300 rounded w-full py-0.5 px-2 bg-slate-50"><a href={project.hosting} target="_blank" class="text-blue-700 cursor-pointer hover:underline">{project.hosting}</a></div>}
                     </div>
                     <div class="flex justify-center py-2">
                         {edit ? (
