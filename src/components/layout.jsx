@@ -9,14 +9,13 @@ const Layout = ({ state, dispatch, children }) => {
         <Context.Provider value={{ state, dispatch }}>
             <div class="h-[100vh] flex flex-col">
                 <Title />
-
                 <div class="grow flex justify-center gap-0">
                     <div class="flex flex-col">
                         <CallerWithVideo localStream={state.localStream} remoteStream={state.remoteStream} />
                         <Chat />
                     </div>
                     <div class="w-full py-4 pr-4 flex flex-col max-w-[1000px]">
-                        <div class="flex justify-start gap-4">
+                        {state.template ? (<div class="flex justify-start gap-4">
                             {state.tabs.map((t) => (
                                 <button
                                     onClick={() => dispatch({ type: "SET_TAB", payload: { tab: t } })}
@@ -25,7 +24,7 @@ const Layout = ({ state, dispatch, children }) => {
                                     {t}
                                 </button>
                             ))}
-                        </div>
+                        </div>) : <div>Choose your communication template</div>}
                         <div class="grow border border-gray-400 rounded p-4">{children}</div>
                     </div>
                 </div>

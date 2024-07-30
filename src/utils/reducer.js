@@ -8,10 +8,13 @@ export const InitState = {
     conn: null,
     call: null,
     messages: [],
+    template: null,
 }
 
 export const reducer = (state, action) => {
     switch (action.type) {
+        case "SET_TEMPLATE":
+            return { ...state, template: action.payload }
         case "SET_PEER":
             if (action.payload.remoteStream && state.remoteStream && state.remoteStream.id !== action.payload.remoteStream.id) {
                 return { ...state, tempStream: action.payload.remoteStream }
