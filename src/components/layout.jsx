@@ -15,16 +15,17 @@ const Layout = ({ state, dispatch, children }) => {
                         <Chat />
                     </div>
                     <div class="w-full py-4 pr-4 flex flex-col max-w-[1000px]">
-                        {state.template ? (<div class="flex justify-start gap-4">
-                            {state.tabs.map((t) => (
-                                <button
-                                    onClick={() => dispatch({ type: "SET_TAB", payload: { tab: t } })}
-                                    class={"font-bold " + (t === state.tab ? "text-gray-700" : "text-blue-500 hover:underline")}
-                                >
-                                    {t}
-                                </button>
-                            ))}
-                        </div>) : <div>Choose your communication template</div>}
+                        
+                            {state.template ? (<div class="flex justify-between gap-2"><div class="flex justify-start gap-4">
+                                {state.tabs.map((t) => (
+                                    <button
+                                        onClick={() => dispatch({ type: "SET_TAB", payload: { tab: t } })}
+                                        class={"font-bold " + (t === state.tab ? "text-gray-700" : "text-blue-500 hover:underline")}
+                                    >
+                                        {t}
+                                    </button>
+                                ))}
+                            </div><div><button class="text-blue-600 hover:underline" onClick={()=>dispatch({type:'SET_TEMPLATE',payload:null})}>Home</button></div></div>) : <div>Choose your communication template</div>}                                                    
                         <div class="grow border border-gray-400 rounded p-4">{children}</div>
                     </div>
                 </div>

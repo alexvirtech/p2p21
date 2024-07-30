@@ -61,8 +61,8 @@ export function App() {
 
     return (
         <Layout state={state} dispatch={dispatch}>
-            {/* {!state.template && <Templates />} */}
-            {!state.template && <Braude />}
+            {!state.template && <Templates />}
+            {state.template === 'braude' && <Braude />}
             {state.tab === "Screen" && <Video stream={state.tempStream} />}
             {state.tab === "Whiteboard" && <Whiteboard />}
             {state.tab === "Documents" && <Documents />}
