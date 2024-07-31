@@ -1,7 +1,14 @@
 *** 31/07 ***
-- main menu
+//- main menu
+//- account menu
 - start page
 - account management
+    //- menu
+    //- info
+    - rename
+    - change password
+    /- new (check if exists)
+    - delete
 - projects 
     - edit 
     - invite participants
