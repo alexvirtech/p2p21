@@ -18,13 +18,19 @@ import Projects from './pages/projects'
 import History from './pages/history'
 import Account from './pages/account'
 import Settings from './pages/settings'
+import { getAccounts } from "./utils/localDB"
 
 export function App() {
     const [state, dispatch] = useReducer(reducer, InitState)
-    const { peer, connect, disconnect } = usePeer(null, dispatch, state)
-    const { isControlled, passControl } = useControl()
+    //const { peer, connect, disconnect } = usePeer(null, dispatch, state)
+    //const { isControlled, passControl } = useControl()
 
-    const startScreenShare = async () => {
+    useEffect(() => {
+        const acc = getAccounts()
+        dispatch({ type: "SET_ACCOUNTS", payload: acc })
+    }, [])
+
+  /*   const startScreenShare = async () => {
         try {
             const screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true })
             dispatch({ type: "SET_TEMP_STREAM", payload: screenStream })
@@ -68,7 +74,7 @@ export function App() {
             closeScreenShare()
         }
     }, [state.tab])
-
+ */
     useEffect(() => {
         const u = state.page.toLowerCase()        
         route(`${u === 'start' ? '/' : `/${u}`}`)

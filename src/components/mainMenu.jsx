@@ -1,7 +1,7 @@
 import LayoutMenu from "../layouts/layoutMenu"
 import { useState, useEffect, useContext } from "preact/hooks"
 import { Context } from "../utils/context"
-import { pages } from "../utils/pages"
+import { pages } from "../utils/menus"
 import { SelectedIcon } from "../utils/icons"
 import { route } from "preact-router"
 

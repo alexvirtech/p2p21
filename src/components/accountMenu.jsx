@@ -1,44 +1,37 @@
 import LayoutMenu from "../layouts/layoutMenu"
 import { useState, useEffect, useContext } from "preact/hooks"
 import { Context } from "../utils/context"
-import { pages } from "../utils/pages"
-import { AccountIcon, SelectedIcon } from "../utils/icons"
-import { route } from "preact-router"
+import { SelectedIcon } from "../utils/icons"
+import { actions } from "../utils/menus"
+import { defAccount } from "../utils/common"
+import Password from "../modals/password"
 
-const AccountMenu = ({ close }) => {
-    const { state, dispatch } = useContext(Context)
-    
-    const actions = [
-        { label: "Create New Account", action: "create" },
-        { label: "Account Details", action: "account" },
-        { label: "Change Password", action: "password" },
-        { label: "Delete Account", action: "delete" }
-    ]
-    
+const AccountMenu = ({ close }) => {    
+    const { state, dispatch } = useContext(Context)           
     const [menu, setMenu] = useState(actions)
 
-    /* useEffect(() => {
-        setMenu(() => updatePages())
+    useEffect(() => {
+        setMenu(() => updateActions())
     }, [])
 
-    useEffect(() => {
-        setMenu(() => updatePages())
-    }, [state.page])
+   useEffect(() => {    
+        setMenu(() => updateActions())
+    }, [state.account.name])
 
-    const updatePages = () => {
-        return pages.map((item) => {
-            if (item.label === state.page) {
-                return { ...item, selected: true }
-            } else {
-                return { ...item, selected: false }
-            }
-        })
-    } */
+    const updateActions = () => {
+        const a = [...actions]
+        return state.account.name === defAccount ? a.filter(a => a.custom) : a        
+    } 
 
-    const handleClick = (lbl) => {
-        //dispatch({ type: "SET_PAGE", payload: lbl })
-        alert(`You clicked ${lbl}`) // temp
+    const handleClick = (a) => {
+        dispatch({ type: "SET_MODAL", payload: a })
+        //alert(`You clicked ${lbl}`) // temp
         close()
+    }
+
+    const handleAccountChange = () => {
+        dispatch({ type: "SET_MODAL", payload: "password" })
+        //dispatch({type:'SET_ACCOUNT',payload:e.target.value})
     }
 
     return (
@@ -47,14 +40,15 @@ const AccountMenu = ({ close }) => {
                 <div class="items-center text-center border-b border-gray-700 p-4">
                     <div class="text-slate-400">Current Account</div>
                     <div class="">
-                        <select class="bg-gray-600 text-white text-2xl w-full border border-slate-400 px-2 py-1 rounded text-center" onChange={(e) => route(e.target.value)}>
-                            <option value="Default">Default</option>
-                            <option value="Account 12">Account 12</option>
+                        <select class="bg-gray-600 text-white text-2xl w-full border border-slate-400 px-2 py-1 rounded text-center" onChange={()=>handleAccountChange()}>
+                            {
+                                state.accounts.map((a,i) => <option key={i} value={a.name} selected={a.name === state.account.name}>{a.name}</option>)
+                            }                           
                         </select>
                     </div>
                 </div>
                 {menu.map((item, index) => (
-                    <div class="hover:bg-gray-700" key={index} onClick={() => handleClick(item.label)}>
+                    <div class="hover:bg-gray-700" key={index} onClick={() => handleClick(item.action)}>
                         <div
                             class={`cursor-pointer flex items justify-center gap-1 items-center h-16 border-b border-gray-700 ${
                                 item.selected ? "px-3" : "px-10"
@@ -66,6 +60,7 @@ const AccountMenu = ({ close }) => {
                     </div>
                 ))}
             </div>
+            {state.modal === 'password' && <Password name={state.account.name} title="Enter Password" close={close} />}
         </LayoutMenu>
     )
 }

@@ -4,20 +4,20 @@ export default function LayoutModal({ children, title, close = ()=>{}, width = "
     return createPortal( 
         <div class="fixed z-[1000] inset-0 overflow-y-auto flex items-start justify-center" onClick={(e)=>e.stopPropagation()}> 
             <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onClick={close}></div>
-            <div class={" rounded-md text-left overflow-hidden shadow-xl transform transition-all " + width + " " + mt}>
-                <div class="bg-m-blue-light-5 dark:bg-m-gray-light-4 px-4 py-3 flex justify-between border-b border-m-blue-light-5 rounded-t-md">
-                    <div class="text-xl">{title}</div>
+            <div class={"z-[1002] rounded-md text-left overflow-hidden shadow-xl transform transition-all " + width + " " + mt}>
+                <div class="bg-slate-600 px-8 py-3 flex justify-between rounded-t-md">
+                    <div class="text-xl text-white">{title}</div>
                     <div>
                         <button
                             title="close"
-                            className="p-0 m-0 text-white border-gray-300 border-0 rounded"
+                            class="p-0 m-0 text-white border-gray-300 border-0 rounded text-xl"
                             onClick={close}
                         >
                             &times;                       
                         </button>
                     </div>
                 </div>
-                <div class="p-0 bg-m-blue-light-2 dark:bg-m-blue-dark-2 ">{children}</div>                
+                <div class="bg-white py-4 px-8">{children}</div>                
             </div>
         </div>,
         document.body

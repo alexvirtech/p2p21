@@ -1,5 +1,8 @@
-
 export const InitState = {
+    accounts: [],
+    account: null, //"Default",
+    tempAcc: null,
+    modal: null,
     page: "Start",
     tabs: ["Dashboard", "Screen", "Whiteboard", "Documents"],
     tab: "Dashboard",
@@ -15,8 +18,18 @@ export const InitState = {
 
 export const reducer = (state, action) => {
     switch (action.type) {
+        case "SET_ACCOUNTS":
+            const selected = action.payload.find(a => a.name === "Default") //temp
+            return { ...state, accounts: action.payload, account: selected }
+        case "ADD_ACCOUNT":
+            return { ...state, accounts: [...state.accounts, action.payload], account: action.payload }
+        case "SET_ACCOUNT":
+            const acc = state.accounts.find(a => a.name === action.payload.name)
+            return { ...state, account: acc }
         case "SET_PAGE":
             return { ...state, page: action.payload }
+        case "SET_MODAL":
+            return { ...state, modal: action.payload }
         case "SET_TEMPLATE":
             return { ...state, template: action.payload }
         case "SET_PEER":
