@@ -1,5 +1,5 @@
 import LayoutMenu from "../layouts/layoutMenu"
-import { useState, useEffect, useContext } from "preact/hooks"
+import { useState, useEffect, useContext, useRef } from "preact/hooks"
 import { Context } from "../utils/context"
 import { SelectedIcon } from "../utils/icons"
 import { actions } from "../utils/menus"
@@ -9,6 +9,7 @@ import Password from "../modals/password"
 const AccountMenu = ({ close }) => {    
     const { state, dispatch } = useContext(Context)           
     const [menu, setMenu] = useState(actions)
+    const tempName = useRef(null)
 
     useEffect(() => {
         setMenu(() => updateActions())
@@ -19,8 +20,8 @@ const AccountMenu = ({ close }) => {
     }, [state.account.name])
 
     const updateActions = () => {
-        const a = [...actions]
-        return state.account.name === defAccount ? a.filter(a => a.custom) : a        
+        const ac = [...actions]
+        return state.account.name === defAccount ? ac.filter(a => a.custom) : ac        
     } 
 
     const handleClick = (a) => {
@@ -30,7 +31,13 @@ const AccountMenu = ({ close }) => {
     }
 
     const handleAccountChange = () => {
-        dispatch({ type: "SET_MODAL", payload: "password" })
+        if(tempName.current.value === defAccount) {
+            dispatch({type:'SET_DEF_ACCOUNT'})            
+            setMenu(() => [...actions].filter(a => a.custom))
+        }else{
+            dispatch({ type: "SET_MODAL", payload: "password" })
+        }
+        
         //dispatch({type:'SET_ACCOUNT',payload:e.target.value})
     }
 
@@ -40,7 +47,7 @@ const AccountMenu = ({ close }) => {
                 <div class="items-center text-center border-b border-gray-700 p-4">
                     <div class="text-slate-400">Current Account</div>
                     <div class="">
-                        <select class="bg-gray-600 text-white text-2xl w-full border border-slate-400 px-2 py-1 rounded text-center" onChange={()=>handleAccountChange()}>
+                        <select class="bg-gray-600 text-white text-2xl w-full border border-slate-400 px-2 py-1 rounded text-center" onChange={()=>handleAccountChange()} ref={tempName}>
                             {
                                 state.accounts.map((a,i) => <option key={i} value={a.name} selected={a.name === state.account.name}>{a.name}</option>)
                             }                           
@@ -60,7 +67,7 @@ const AccountMenu = ({ close }) => {
                     </div>
                 ))}
             </div>
-            {state.modal === 'password' && <Password name={state.account.name} title="Enter Password" close={close} />}
+            {state.modal === 'password' && <Password name={tempName.current.value} title="Enter Password" close={close} />}
         </LayoutMenu>
     )
 }

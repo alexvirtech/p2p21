@@ -19,13 +19,15 @@ export const InitState = {
 export const reducer = (state, action) => {
     switch (action.type) {
         case "SET_ACCOUNTS":
-            const selected = action.payload.find(a => a.name === "Default") //temp
+            const selected = action.payload.find((a) => a.name === "Default") //temp
             return { ...state, accounts: action.payload, account: selected }
         case "ADD_ACCOUNT":
             return { ...state, accounts: [...state.accounts, action.payload], account: action.payload }
+        case "ADD_DEF_ACCOUNT":
+            const selected2 = action.payload.find((a) => a.name === "Default")
+            return { ...state, account: selected2 }
         case "SET_ACCOUNT":
-            const acc = state.accounts.find(a => a.name === action.payload.name)
-            return { ...state, account: acc }
+            return { ...state, account: action.payload }
         case "SET_PAGE":
             return { ...state, page: action.payload }
         case "SET_MODAL":
