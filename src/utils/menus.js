@@ -4,8 +4,8 @@ export const pages = [
     { label: "Basic" },
     { label: "Advanced" },
     { label: "Contacts" },
-    { label: "Groups" },
-    { label: "Projects" },
+    /* { label: "Groups" },
+    { label: "Projects" }, */
     { label: "History" },
     { label: "Settings" }
 ]

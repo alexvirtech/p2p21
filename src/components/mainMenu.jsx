@@ -45,7 +45,7 @@ const MainMenu = ({ close }) => {
                     <div class="hover:bg-gray-700" key={index} onClick={() => handleClick(item.label)}>
                         <div
                             class={`cursor-pointer flex items justify-start gap-1 items-center h-16 border-b border-gray-700 ${
-                                item.selected ? "px-3" : "px-10"
+                                item.selected ? "px-4" : "px-10"
                             }`}
                         >
                             {item.selected && (
