@@ -1,8 +1,8 @@
 import { Context } from "../utils/context"
-import Title from "./title"
-import CallerWithVideo from "./callerWithVideo"
-import Chat from "./chat"
-import Status from "./status"
+import Title from "../components/title"
+import CallerWithVideo from "../components/callerWithVideo"
+import Chat from "../components/chat"
+import Status from "../components/status"
 
 const Layout = ({ state, dispatch, children }) => {
     return (
@@ -10,7 +10,8 @@ const Layout = ({ state, dispatch, children }) => {
             <div class="h-[100vh] flex flex-col">
                 <Title />
                 <div class="grow flex justify-center gap-0">
-                    <div class="flex flex-col">
+                    {children}
+                   {/*  <div class="flex flex-col">
                         <CallerWithVideo localStream={state.localStream} remoteStream={state.remoteStream} />
                         <Chat />
                     </div>
@@ -25,9 +26,9 @@ const Layout = ({ state, dispatch, children }) => {
                                         {t}
                                     </button>
                                 ))}
-                            </div><div><button class="text-blue-600 hover:underline" onClick={()=>dispatch({type:'SET_TEMPLATE',payload:null})}>Home</button></div></div>) : <div>Choose your communication template</div>}                                                    
+                            </div><div><button class="text-blue-600 hover:underline" onClick={()=>dispatch({type:'SET_TEMPLATE',payload:null})}>Templates</button></div></div>) : <div>Choose your communication template</div>}                                                    
                         <div class="grow border border-gray-400 rounded p-4">{children}</div>
-                    </div>
+                    </div> */}
                 </div>
 
                 <Status isConnected={state.remoteStream} />

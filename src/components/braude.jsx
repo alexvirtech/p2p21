@@ -46,10 +46,12 @@ export default function Braude() {
     }
 
     return (
-        <div class="h-full flex flex-col gap-4 text-sm">
-            <div class="h-[320px] flex justify-start gap-4">
-                <div class="grow h-full border border-slate-400 rounded px-4 py-2">
-                    <div class="flex justify-flex gap-2">
+        <div class="h-full flex flex-col gap-4">
+            <div class="border-b border-slate-300">Template: <b>Braude</b></div>
+            <div class="h-full flex flex-col gap-1">            
+               {/*  <div class="grow h-full border border-slate-400 rounded px-4 py-2"> */}
+                    
+                    <div class="grow flex justify-flex gap-2">
                         <div class="w-1/2">
                             <div>Title</div>
                             <div>
@@ -85,7 +87,7 @@ export default function Braude() {
                         ></textarea>
                     </div>
                     <div class="flex justify-start gap-4">
-                        <div class="w-[130px]">Collaboration tools</div>
+                        <div class="w-[180px]">Collaboration tools</div>
                         <div class="flex justify-start gap-2">
                             {tools.map((tool) => (
                                 <div class="flex justify-start gap-2">
@@ -101,7 +103,7 @@ export default function Braude() {
                         </div>
                     </div>
                     <div class="flex justify-start gap-4">
-                        <div class="w-[130px]">Accessibility</div>
+                        <div class="w-[180px]">Accessibility</div>
                         <div class="flex justify-start gap-2">
                             <input
                                 disabled={!edit}
@@ -159,10 +161,10 @@ export default function Braude() {
                             </button>
                         )}
                     </div>
-                </div>
+                {/* </div> */}
                 <div class="w-[300px] h-full border border-slate-400 rounded px-4 py-2">Group</div>
             </div>
-            <div class="grow border border-slate-400 rounded px-4 py-2">Tasks</div>
+            {/* <div class="grow border border-slate-400 rounded px-4 py-2">Tasks</div> */}
         </div>
     )
 }

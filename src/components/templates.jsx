@@ -20,7 +20,7 @@ export default function Templates() {
 
             <div class="h-[210px] w-[210px] border-4 border-transparent rounded  hover:border-red-600 bg-white cursor-pointer" title="Use Braude project template"  onClick={()=>dispatch({type:'SET_TEMPLATE',payload:'braude'})}>
             <div class="h-full flex flex-col gap-1 border border-slate-400 rounded hover:border-transparent">
-                    <div class="font-bold text-center">Braude project</div>
+                    <div class="font-bold text-center">Braude</div>
                     <div class="w-[180px] h-[60px] mx-auto rounded bg-slate-300 p-4 flex justify-center items-center">
                         image
                     </div>

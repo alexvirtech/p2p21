@@ -1,4 +1,6 @@
+
 export const InitState = {
+    page: "Start",
     tabs: ["Dashboard", "Screen", "Whiteboard", "Documents"],
     tab: "Dashboard",
     localStream: null,
@@ -13,6 +15,8 @@ export const InitState = {
 
 export const reducer = (state, action) => {
     switch (action.type) {
+        case "SET_PAGE":
+            return { ...state, page: action.payload }
         case "SET_TEMPLATE":
             return { ...state, template: action.payload }
         case "SET_PEER":

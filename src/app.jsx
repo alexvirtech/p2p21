@@ -1,5 +1,5 @@
 import { useReducer, useEffect } from "preact/hooks"
-import Layout from "./components/layout"
+import Layout from "./layouts/layout"
 import { InitState, reducer } from "./utils/reducer"
 import { usePeer } from "./hooks/usePeer"
 import { useControl } from "./hooks/useControl"
@@ -8,6 +8,16 @@ import Whiteboard from "./components/whiteboard"
 import Documents from "./components/documents"
 import Templates from "./components/templates"
 import Braude from "./components/braude"
+import Router, { route } from 'preact-router'
+import Start from './pages/start'
+import Basic from './pages/basic'
+import Advanced from './pages/advanced'
+import Contacts from './pages/contacts'
+import Groups from './pages/groups'
+import Projects from './pages/projects'
+import History from './pages/history'
+import Account from './pages/account'
+import Settings from './pages/settings'
 
 export function App() {
     const [state, dispatch] = useReducer(reducer, InitState)
@@ -59,14 +69,29 @@ export function App() {
         }
     }, [state.tab])
 
+    useEffect(() => {
+        const u = state.page.toLowerCase()        
+        route(`${u === 'start' ? '/' : `/${u}`}`)
+    },[state.page])
+
     return (
         <Layout state={state} dispatch={dispatch}>
-            {!state.template && <Templates />}
+            <Router>
+                <Start path="/" />
+                <Basic path="/basic" />
+                <Advanced path="/advanced" />
+                <Contacts path="/contacts" />
+                <Groups path="/groups" />
+                <Projects path="/projects" />
+                <History path="/history" />
+                <Account path="/account" />
+                <Settings path="/settings" />
+            </Router>
+            {/* {!state.template && <Templates />}
             {state.template === 'braude' && <Braude />}
             {state.tab === "Screen" && <Video stream={state.tempStream} />}
             {state.tab === "Whiteboard" && <Whiteboard />}
-            {state.tab === "Documents" && <Documents />}
-            {/* {isControlled && <button onClick={passControl}>Pass Control</button>} */}
+            {state.tab === "Documents" && <Documents />}        */}    
         </Layout>
     )
 }

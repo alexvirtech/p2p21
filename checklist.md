@@ -1,4 +1,26 @@
-*** 22/07 ***
+*** 31/07 ***
+- main menu
+- start page
+- account management
+- projects 
+    - edit 
+    - invite participants
+    - tasks page 
+    - delete
+
+- session
+    - start    
+    - log session events
+
+- contacts
+
+- groups (edit, invite, delete)
+- history
+
+
+
+
+*** prev ***
 - flow and main content
     - start page
     - advanced
