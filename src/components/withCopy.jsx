@@ -39,6 +39,7 @@ function WithCopy({ children, tooltipText = "Copied to clipboard!" }) {
                     zIndex: 1,
                 }}
                 aria-label="Copy to clipboard"
+                title="Copy to clipboard"
                 tabindex="0" // Ensures the button can receive focus
             />
             {copied && (

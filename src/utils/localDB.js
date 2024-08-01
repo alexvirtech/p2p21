@@ -42,7 +42,7 @@ export const deleteAccountByName = (name,password) => {
 }
 
 export const renameAccount = (name,newName,password) => {
-    if(name===defAccount) return 'Default account cannot be deleted'
+    if(name===defAccount) return 'Default account cannot be renamed'
     const acc = getAccounts()    
     const ren = acc.find((a) => a.name === name)
     const wallet = decrypt(ren.encWallet, password)
@@ -50,6 +50,21 @@ export const renameAccount = (name,newName,password) => {
 
     const updatedAcc = acc.map((a) => {
         return a.name === name ? {...a, name: newName} : a        
+    })
+    localStorage.setItem("accounts", JSON.stringify(updatedAcc))
+    return null
+}
+
+export const changeAccountPassword = (name,newPassword,password) => {
+    if(name===defAccount) return 'Default account has not password'
+    const acc = getAccounts()    
+    const ren = acc.find((a) => a.name === name)
+    const wallet = decrypt(ren.encWallet, password)
+    if(!wallet) return 'Wrong password'    
+
+    const { publicKey, privateKey, mnemonic } = wallet   
+    const updatedAcc = acc.map((a) => {
+        return a.name === name ? {...a, encWallet: encrypt(JSON.stringify({ publicKey, privateKey, mnemonic }), newPassword)} : a        
     })
     localStorage.setItem("accounts", JSON.stringify(updatedAcc))
     return null

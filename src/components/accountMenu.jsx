@@ -9,20 +9,7 @@ import Password from "../modals/password"
 const AccountMenu = ({ close }) => {    
     const { state, dispatch } = useContext(Context)           
     const [menu, setMenu] = useState(actions)
-    const tempName = useRef(null)
-
-    useEffect(() => {
-        setMenu(() => updateActions())
-    }, [])
-
-   useEffect(() => {    
-        setMenu(() => updateActions())
-    }, [state.account.name])
-
-    const updateActions = () => {
-        const ac = [...actions]
-        return state.account.name === defAccount ? ac.filter(a => a.custom) : ac        
-    } 
+    const tempName = useRef(null)   
 
     const handleClick = (a) => {
         dispatch({ type: "SET_MODAL", payload: a })
@@ -58,15 +45,17 @@ const AccountMenu = ({ close }) => {
                     </div>
                 </div>
                 {menu.map((item, index) => (
-                    <div class="hover:bg-gray-700" key={index} onClick={() => handleClick(item.action)}>
-                        <div
-                            class={`cursor-pointer flex items justify-center gap-1 items-center h-16 border-b border-gray-700 ${
-                                item.selected ? "px-3" : "px-10"} ${item.border ? 'border-b-4' : 'border-b'}`}
-                        >
-                            {item.selected && <SelectedIcon />}
-                            <div class="text-white font-semibold">{item.label}</div>
-                        </div>
-                    </div>
+                    <>
+                        {((tempName.current && tempName.current?.value !== defAccount) || item.custom) && <div class="hover:bg-gray-700" key={index} onClick={() => handleClick(item.action)}>
+                            <div
+                                class={`cursor-pointer flex items justify-center gap-1 items-center h-16 border-b border-gray-700 ${
+                                    item.selected ? "px-3" : "px-10"} ${item.border ? 'border-b-4' : 'border-b'}`}
+                            >
+                                {item.selected && <SelectedIcon />}
+                                <div class="text-white font-semibold">{item.label}</div>
+                            </div>
+                        </div>}
+                    </>
                 ))}
             </div>
             {state.modal === 'password' && <Password name={tempName.current?.value} title="Enter Password" close={closePassword} />}

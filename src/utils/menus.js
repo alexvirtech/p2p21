@@ -14,7 +14,7 @@ export const pages = [
 export const actions = [
     { label: "Account Info", action: "info",custom:true },    
     { label: "Rename Account", action: "rename",custom:false},
-    { label: "Change Password", action: "password",custom:false},   
+    { label: "Change Password", action: "changePassword",custom:false},   
     { label: "Create New Account", action: "create",custom:true,border:true },
     { label: "Backup Account", action: "backup",custom:true },    
     { label: "Restore Account", action: "restore",custom:true,border:true },    

@@ -7,6 +7,7 @@ import CreateAccount from "../modals/createAccount"
 import AccountInfo from "../modals/accountInfo"
 import DeleteAccount from "../modals/deleteAccount"
 import RenameAccount from "../modals/renameAccount"
+import ChangePassword from "../modals/changePassword"
 
 const Title = () => {
     const { state, dispatch } = useContext(Context)
@@ -28,6 +29,7 @@ const Title = () => {
             {state.modal === 'info' && <AccountInfo close={()=>dispatch({type:'SET_MODAL',payload:null})}/>}
             {state.modal === 'delete' && <DeleteAccount close={()=>dispatch({type:'SET_MODAL',payload:null})}/>}
             {state.modal === 'rename' && <RenameAccount close={()=>dispatch({type:'SET_MODAL',payload:null})}/>}
+            {state.modal === 'changePassword' && <ChangePassword close={()=>dispatch({type:'SET_MODAL',payload:null})}/>}
             {/* {state.modal === 'create' && <CreateAccount close={()=>dispatch({type:'SET_MODAL',payload:null})}/>}
             {state.modal === 'create' && <CreateAccount close={()=>dispatch({type:'SET_MODAL',payload:null})}/>} */}
         </div>

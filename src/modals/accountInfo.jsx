@@ -18,7 +18,6 @@ export default function AccountInfo({ close }) {
                <WithCopy>
                     <input
                         class="w-full border border-slate-400 rounded py-1.5 px-4 text-sm"                        
-                        title="Click to copy"
                         disabled
                         value={state.account.name}
                     />
@@ -29,7 +28,6 @@ export default function AccountInfo({ close }) {
                 <WithCopy>
                     <textarea
                         onClick={(e) => navigator.clipboard.writeText(e.target.value)}
-                        title="Click to copy"
                         rows="2"
                         class="w-full border border-slate-400 rounded py-1.5 px-4 text-sm"
                         disabled
@@ -42,7 +40,6 @@ export default function AccountInfo({ close }) {
                 <WithCopy>
                     <textarea
                         onClick={(e) => navigator.clipboard.writeText(e.target.value)}
-                        title="Click to copy"
                         rows="2"
                         class="w-full border border-slate-400 rounded py-1.5 px-4 text-sm"
                         disabled
@@ -55,7 +52,6 @@ export default function AccountInfo({ close }) {
                 <WithCopy>
                     <textarea
                         onClick={(e) => navigator.clipboard.writeText(e.target.value)}
-                        title="Click to copy"
                         class="w-full border border-slate-400 rounded py-1.5 px-4 text-sm"
                         disabled
                         rows="2"

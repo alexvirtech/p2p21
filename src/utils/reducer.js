@@ -1,3 +1,5 @@
+import { encrypt, decrypt } from "./crypto"
+
 export const InitState = {
     accounts: [],
     account: null, //"Default",
@@ -31,12 +33,20 @@ export const reducer = (state, action) => {
         case "DELETE_ACCOUNT":
             const updatedAcc = state.accounts.filter((a) => a.name !== state.account.name)
             const selected3 = state.accounts.find((a) => a.name === "Default")
-            return { ...state, accounts: updatedAcc, account:selected3 }
+            return { ...state, accounts: updatedAcc, account: selected3 }
         case "RENAME_ACCOUNT":
             const updatedAcc2 = state.accounts.map((a) => {
                 return a.name === state.account.name ? { ...a, name: action.payload } : a
             })
             return { ...state, accounts: updatedAcc2, account: { ...state.account, name: action.payload } }
+        case "CHANGE_PASSWORD":            
+            const { publicKey, privateKey, mnemonic } = state.account.wallet            
+            const updatedAcc3 = state.accounts.map((a) => {
+                return a.name === state.account.name
+                    ? { ...a, encWallet: encrypt(JSON.stringify({ publicKey, privateKey, mnemonic }), action.payload) }
+                    : a
+            })
+            return { ...state, accounts: updatedAcc3, account: { ...state.account, name: action.payload } }
         case "SET_PAGE":
             return { ...state, page: action.payload }
         case "SET_MODAL":
