@@ -1,6 +1,11 @@
+import Templates from "../components/templates"
+
 const Advanced = () => {
     return (
-        <div>temp for Advanced page</div>
+        <div>            
+            <div class="text-center">Choose your communication template</div>
+            <Templates />
+        </div>
     )
 }
 

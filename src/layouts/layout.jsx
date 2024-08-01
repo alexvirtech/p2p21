@@ -9,7 +9,7 @@ const Layout = ({ state, dispatch, children }) => {
         <Context.Provider value={{ state, dispatch }}>
             <div class="h-[100vh] flex flex-col">
                 <Title />
-                <div class="grow flex justify-center gap-0">
+                <div class="grow flex justify-center gap-0 py-4">
                     {children}
                    {/*  <div class="flex flex-col">
                         <CallerWithVideo localStream={state.localStream} remoteStream={state.remoteStream} />
