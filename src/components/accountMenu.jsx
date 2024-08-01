@@ -44,7 +44,7 @@ const AccountMenu = ({ close }) => {
                         </select>
                     </div>
                 </div>
-                {menu.map((item, index) => (
+                {actions.map((item, index) => (
                     <>
                         {((tempName.current && tempName.current?.value !== defAccount) || item.custom) && <div class="hover:bg-gray-700" key={index} onClick={() => handleClick(item.action)}>
                             <div
