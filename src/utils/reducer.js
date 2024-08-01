@@ -1,8 +1,9 @@
+import { defAccount } from "./common"
 import { encrypt, decrypt } from "./crypto"
 
 export const InitState = {
     accounts: [],
-    account: null, //"Default",
+    account: null, //defAccount,
     tempAcc: null,
     modal: null,
     page: "Start",
@@ -21,26 +22,30 @@ export const InitState = {
 export const reducer = (state, action) => {
     switch (action.type) {
         case "SET_ACCOUNTS":
-            const selected = action.payload.find((a) => a.name === "Default") //temp
+            const selected = action.payload.find((a) => a.name === defAccount) //temp
             return { ...state, accounts: action.payload, account: selected }
         case "ADD_ACCOUNT":
             return { ...state, accounts: [...state.accounts, action.payload], account: action.payload }
-        case "ADD_DEF_ACCOUNT":
-            const selected2 = action.payload.find((a) => a.name === "Default")
+        case "SET_DEF_ACCOUNT":
+            const selected2 = state.accounts.find((a) => a.name === defAccount)
             return { ...state, account: selected2 }
         case "SET_ACCOUNT":
             return { ...state, account: action.payload }
+        /* case "SET_ACCOUNT_BY_NAME":
+            const selected4 = state.accounts.find((a) => a.name === action.payload)
+            const w = action.payload === defAccount ? selected4.wallet : JSON.parse(decrypt(selected4.encWallet, action.password))
+            return { ...state, account: w } */
         case "DELETE_ACCOUNT":
             const updatedAcc = state.accounts.filter((a) => a.name !== state.account.name)
-            const selected3 = state.accounts.find((a) => a.name === "Default")
+            const selected3 = state.accounts.find((a) => a.name === defAccount)
             return { ...state, accounts: updatedAcc, account: selected3 }
         case "RENAME_ACCOUNT":
             const updatedAcc2 = state.accounts.map((a) => {
                 return a.name === state.account.name ? { ...a, name: action.payload } : a
             })
             return { ...state, accounts: updatedAcc2, account: { ...state.account, name: action.payload } }
-        case "CHANGE_PASSWORD":            
-            const { publicKey, privateKey, mnemonic } = state.account.wallet            
+        case "CHANGE_PASSWORD":
+            const { publicKey, privateKey, mnemonic } = state.account.wallet
             const updatedAcc3 = state.accounts.map((a) => {
                 return a.name === state.account.name
                     ? { ...a, encWallet: encrypt(JSON.stringify({ publicKey, privateKey, mnemonic }), action.payload) }

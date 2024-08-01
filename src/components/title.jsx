@@ -15,12 +15,12 @@ const Title = () => {
     const [showMainMenu, setShowMain] = useState(false)
     const [showAccMenu, setShowAcc] = useState(false)
 
-    useEffect(() => {
+    /* useEffect(() => {
         if(!state.account.name){    
             const acc = state.accounts.find((a) => a.name === defAccount)   
             dispatch({ type: "SET_ACCOUNT", payload: { name:defAccount, wallet: acc.wallet } })            
         }        
-    }, [state.account.name])
+    }, [state.account.name]) */
 
     return (
         <div class="border-b border-gray-500 flex justify-between relative items-center h-16">

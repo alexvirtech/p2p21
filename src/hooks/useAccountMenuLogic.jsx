@@ -14,7 +14,7 @@ const useAccountMenuLogic = (defAccount, state, dispatch) => {
         const newAccount = e.target.value
         if (newAccount === defAccount) {
             setSelectedAccount(defAccount)
-            dispatch({ type: "SET_ACCOUNT", payload: defAccount })
+            dispatch({ type: "SET_DEF_ACCOUNT"})
         } else {
             dispatch({ type: "SET_MODAL", payload: "password" })
         }
@@ -23,9 +23,10 @@ const useAccountMenuLogic = (defAccount, state, dispatch) => {
     const handlePasswordSubmit = (isPasswordCorrect) => {
         if (isPasswordCorrect) {
             setSelectedAccount(tempName.current?.value)
-            dispatch({ type: "SET_ACCOUNT", payload: tempName.current?.value })
+            //dispatch({ type: "SET_ACCOUNT", payload: tempName.current?.value })
         } else {
             setSelectedAccount(defAccount)
+            dispatch({ type: "SET_DEF_ACCOUNT"})
         }
         dispatch({ type: "SET_MODAL", payload: null })
     }
