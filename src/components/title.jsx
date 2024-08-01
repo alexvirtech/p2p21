@@ -8,11 +8,19 @@ import AccountInfo from "../modals/accountInfo"
 import DeleteAccount from "../modals/deleteAccount"
 import RenameAccount from "../modals/renameAccount"
 import ChangePassword from "../modals/changePassword"
+import { defAccount } from "../utils/common"
 
 const Title = () => {
     const { state, dispatch } = useContext(Context)
     const [showMainMenu, setShowMain] = useState(false)
     const [showAccMenu, setShowAcc] = useState(false)
+
+    useEffect(() => {
+        if(!state.account.name){    
+            const acc = state.accounts.find((a) => a.name === defAccount)   
+            dispatch({ type: "SET_ACCOUNT", payload: { name:defAccount, wallet: acc.wallet } })            
+        }        
+    }, [state.account.name])
 
     return (
         <div class="border-b border-gray-500 flex justify-between relative items-center h-16">
