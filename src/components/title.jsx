@@ -8,7 +8,8 @@ import AccountInfo from "../modals/accountInfo"
 import DeleteAccount from "../modals/deleteAccount"
 import RenameAccount from "../modals/renameAccount"
 import ChangePassword from "../modals/changePassword"
-import { defAccount } from "../utils/common"
+import RestoreAccount from "../modals/restoreAccount"
+//import { defAccount } from "../utils/common"
 
 const Title = () => {
     const { state, dispatch } = useContext(Context)
@@ -38,6 +39,7 @@ const Title = () => {
             {state.modal === 'delete' && <DeleteAccount close={()=>dispatch({type:'SET_MODAL',payload:null})}/>}
             {state.modal === 'rename' && <RenameAccount close={()=>dispatch({type:'SET_MODAL',payload:null})}/>}
             {state.modal === 'changePassword' && <ChangePassword close={()=>dispatch({type:'SET_MODAL',payload:null})}/>}
+            {state.modal === 'restore' && <RestoreAccount close={()=>dispatch({type:'SET_MODAL',payload:null})}/>}
             {/* {state.modal === 'create' && <CreateAccount close={()=>dispatch({type:'SET_MODAL',payload:null})}/>}
             {state.modal === 'create' && <CreateAccount close={()=>dispatch({type:'SET_MODAL',payload:null})}/>} */}
         </div>

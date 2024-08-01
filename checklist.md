@@ -2,15 +2,15 @@
 //- main menu
 //- account menu
 - start page
-- account management
+//- account management
     //- menu
     //- info
     //- rename
     //- change password
     //- new (check if exists)
     //- delete
-    - backup
-    - restore
+    //- backup
+    //- restore
 - projects 
     - edit 
     - invite participants

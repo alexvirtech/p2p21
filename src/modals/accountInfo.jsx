@@ -6,10 +6,9 @@ import WithCopy from "../components/withCopy"
 export default function AccountInfo({ close }) {
     const { state, dispatch } = useContext(Context)
 
-    useEffect(() => {
-        if (state.modal !== "info") return
+    useEffect(() => {        
         //alert(state.account)
-    }, [state.modal])
+    }, [])
 
     return (
         <LayoutModal title="Account Info" close={close}>

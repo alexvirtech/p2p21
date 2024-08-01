@@ -1,3 +1,5 @@
+import { getAccountBackup } from "./localDB"
+
 // main menu
 export const pages = [
     { label: "Start",border: true },    
@@ -16,7 +18,7 @@ export const actions = [
     { label: "Rename Account", action: "rename",custom:false},
     { label: "Change Password", action: "changePassword",custom:false},   
     { label: "Create New Account", action: "create",custom:true,border:true },
-    { label: "Backup Account", action: "backup",custom:true },    
+    { label: "Backup Account", action: "backup",custom:true, func: (a)=>getAccountBackup(a)},    
     { label: "Restore Account", action: "restore",custom:true,border:true },    
     { label: "Delete Account", action: "delete",custom:false }
 ]

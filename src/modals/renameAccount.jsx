@@ -10,10 +10,9 @@ export default function RenameAccount({ close }) {
     const newName = useRef()
 
     useEffect(() => {
-        if (state.modal !== "rename") return     
         newName.current.value = ''   
         newName.current.focus()
-    }, [state.modal])
+    }, [])
 
     const handleSubmit = (e) => {
         e.preventDefault()       
@@ -54,7 +53,7 @@ export default function RenameAccount({ close }) {
                     <button class="bg-blue-500 text-white rounded py-1.5 px-8 my-4 cursor-pointer" type="submit">
                         Submit
                     </button>
-                    <div class="text-red-600 my-5">{error}</div>
+                    <div class="text-red-600 my-5 text-xs">{error}</div>
                 </div>
             </form>
         </LayoutModal>

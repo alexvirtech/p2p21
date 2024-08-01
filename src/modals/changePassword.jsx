@@ -12,10 +12,9 @@ export default function ChangePassword({ close }) {
     const newName = useRef()
 
     useEffect(() => {
-        if (state.modal !== "rename") return     
         password.current.value = ''   
         password.current.focus()
-    }, [state.modal])
+    }, [])
 
     const handleSubmit = (e) => {
         e.preventDefault()       
@@ -61,7 +60,7 @@ export default function ChangePassword({ close }) {
                     <button class="bg-blue-500 text-white rounded py-1.5 px-8 my-4 cursor-pointer" type="submit">
                         Submit
                     </button>
-                    <div class="text-red-600 my-5">{error}</div>
+                    <div class="text-red-600 my-5 text-xs">{error}</div>
                 </div>
             </form>
         </LayoutModal>

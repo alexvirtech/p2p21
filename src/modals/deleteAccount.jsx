@@ -9,10 +9,9 @@ export default function DeleteAccount({ close }) {
     const password = useRef()
 
     useEffect(() => {
-        if (state.modal !== "password") return     
         password.current.value = ''   
         password.current.focus()
-    }, [state.modal])
+    }, [])
 
     const handleSubmit = (e) => {
         e.preventDefault()       
@@ -45,7 +44,7 @@ export default function DeleteAccount({ close }) {
                     <button class="bg-blue-500 text-white rounded py-1.5 px-8 my-4 cursor-pointer" type="submit">
                         Delete
                     </button>
-                    <div class="text-red-600 my-5">{error}</div>
+                    <div class="text-red-600 my-5 text-xs">{error}</div>
                 </div>
             </form>
         </LayoutModal>

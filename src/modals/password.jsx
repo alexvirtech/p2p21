@@ -58,7 +58,7 @@ export default function Password({ name, title, close = () => {}, width = "w-[90
                 </div>
                 <div class="pt-1 flex justify-start gap-4">
                     <button class="bg-blue-500 text-white rounded py-1.5 px-8 my-4 cursor-pointer">Submit</button>
-                    <div class="text-red-600 my-5">{error}</div>
+                    <div class="text-red-600 my-5 text-xs">{error}</div>
                 </div>
                 
             </form>

@@ -15,8 +15,12 @@ const AccountMenu = ({ close }) => {
         dispatch,
     )
 
-    const handleClick = (action) => {
-        dispatch({ type: "SET_MODAL", payload: action })
+    const handleClick = (item) => {
+        if(item.func){
+            item.func(state.account.name)
+        }else{
+            dispatch({ type: "SET_MODAL", payload: item.action })
+        }        
         close()
     }
 
@@ -43,7 +47,7 @@ const AccountMenu = ({ close }) => {
                 {actions.map((item, index) => (
                     <>
                         {(selectedAccount !== defAccount || item.custom) && (
-                            <div class="hover:bg-gray-700" key={index} onClick={() => handleClick(item.action)}>
+                            <div class="hover:bg-gray-700" key={index} onClick={() => handleClick(item)}>
                                 <div
                                     class={`cursor-pointer flex justify-center gap-1 items-center h-16 border-b border-gray-700 ${
                                         item.selected ? "px-3" : "px-10"
