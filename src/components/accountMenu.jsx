@@ -36,9 +36,12 @@ const AccountMenu = ({ close }) => {
             setMenu(() => [...actions].filter(a => a.custom))
         }else{
             dispatch({ type: "SET_MODAL", payload: "password" })
-        }
-        
-        //dispatch({type:'SET_ACCOUNT',payload:e.target.value})
+        }        
+    }
+
+    const closePassword = () => {     
+        dispatch({ type: "SET_MODAL", payload: null })   
+        close()
     }
 
     return (
@@ -58,8 +61,7 @@ const AccountMenu = ({ close }) => {
                     <div class="hover:bg-gray-700" key={index} onClick={() => handleClick(item.action)}>
                         <div
                             class={`cursor-pointer flex items justify-center gap-1 items-center h-16 border-b border-gray-700 ${
-                                item.selected ? "px-3" : "px-10"
-                            }`}
+                                item.selected ? "px-3" : "px-10"} ${item.border ? 'border-b-4' : 'border-b'}`}
                         >
                             {item.selected && <SelectedIcon />}
                             <div class="text-white font-semibold">{item.label}</div>
@@ -67,7 +69,7 @@ const AccountMenu = ({ close }) => {
                     </div>
                 ))}
             </div>
-            {state.modal === 'password' && <Password name={tempName.current.value} title="Enter Password" close={close} />}
+            {state.modal === 'password' && <Password name={tempName.current?.value} title="Enter Password" close={closePassword} />}
         </LayoutMenu>
     )
 }

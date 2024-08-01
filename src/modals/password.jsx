@@ -1,3 +1,4 @@
+// password modal for account change
 import { decrypt } from "../utils/crypto"
 import LayoutModal from "../layouts/layoutModal"
 import { useState, useRef, useContext, useEffect } from "preact/hooks"
@@ -24,11 +25,11 @@ export default function Password({ name, title, close = () => {}, width = "w-[90
                 dispatch({ type: "SET_ACCOUNT", payload: { name, wallet: JSON.parse(wallet) } })
                 closeModal()
             } else {
-                setError("wrong password...")
+                setError("Wrong password...")
             }
         } catch (e) {
             console.log(e)
-            setError("wrong password...")
+            setError("Wrong password...")
         } finally {
             //
         }

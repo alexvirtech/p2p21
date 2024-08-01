@@ -28,6 +28,15 @@ export const reducer = (state, action) => {
             return { ...state, account: selected2 }
         case "SET_ACCOUNT":
             return { ...state, account: action.payload }
+        case "DELETE_ACCOUNT":
+            const updatedAcc = state.accounts.filter((a) => a.name !== state.account.name)
+            const selected3 = state.accounts.find((a) => a.name === "Default")
+            return { ...state, accounts: updatedAcc, account:selected3 }
+        case "RENAME_ACCOUNT":
+            const updatedAcc2 = state.accounts.map((a) => {
+                return a.name === state.account.name ? { ...a, name: action.payload } : a
+            })
+            return { ...state, accounts: updatedAcc2, account: { ...state.account, name: action.payload } }
         case "SET_PAGE":
             return { ...state, page: action.payload }
         case "SET_MODAL":

@@ -4,30 +4,48 @@ import LayoutModal from "../layouts/layoutModal"
 import { createAccount } from "../utils/account"
 import { useRef } from "preact/hooks"
 import { encrypt } from "../utils/crypto"
-import { addAccount } from "../utils/localDB"
+import { addAccount, ifAccountExists } from "../utils/localDB"
 
 export default function CreateAccount({ close }) {
     const { state, dispatch } = useContext(Context)
     const name = useRef()
     const password = useRef()
     const confirmPassword = useRef()
+    const [error, setError] = useState("")
+
+    useEffect(() => {
+        if (state.modal !== "create") return     
+        name.current.value = ''   
+        name.current.focus()
+    }, [state.modal])
 
     const handleSubmit = (e) => {
         e.preventDefault()
-        // temp
+        if (ifAccountExists(name.current.value)) {
+            setError("Account already exists")
+            return
+        }
         const { publicKey, privateKey, mnemonic } = createAccount()
         const acc1 = {
             name: name.current.value,
-            wallet: { publicKey, privateKey, mnemonic: mnemonic.phrase }            
+            wallet: { publicKey, privateKey, mnemonic: mnemonic.phrase },
         }
-        dispatch({ type: "ADD_ACCOUNT", payload: acc1 })        
+        dispatch({ type: "ADD_ACCOUNT", payload: acc1 })
         const acc2 = {
-            name: name.current.value,            
-            encWallet: encrypt(JSON.stringify({ publicKey, privateKey, mnemonic: mnemonic.phrase }), password.current.value)
+            name: name.current.value,
+            encWallet: encrypt(JSON.stringify({ publicKey, privateKey, mnemonic: mnemonic.phrase }), password.current.value),
         }
         addAccount(acc2)
         close()
-    }    
+    }
+
+    useEffect(() => {
+        if (error) {
+            setTimeout(() => {
+                setError("")
+            }, 5000)
+        }
+    }, [error])
 
     return (
         <LayoutModal title="Create Account" close={close}>
@@ -49,10 +67,9 @@ export default function CreateAccount({ close }) {
                         ref={confirmPassword}
                     />
                 </div>
-                <div class="pt-1">
-                    <button class="bg-blue-500 text-white rounded py-1.5 px-8 my-4 cursor-pointer">
-                        Create
-                    </button>
+                <div class="pt-1 flex justify-start gap-4">
+                    <button class="bg-blue-500 text-white rounded py-1.5 px-8 my-4 cursor-pointer" type="submit">Create</button>
+                    <div class="text-red-600 my-5">{error}</div>
                 </div>
             </form>
         </LayoutModal>

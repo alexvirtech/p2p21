@@ -5,6 +5,8 @@ import AccountMenu from "./accountMenu"
 import { AccountIcon, MainMenuIcon } from "../utils/icons"
 import CreateAccount from "../modals/createAccount"
 import AccountInfo from "../modals/accountInfo"
+import DeleteAccount from "../modals/deleteAccount"
+import RenameAccount from "../modals/renameAccount"
 
 const Title = () => {
     const { state, dispatch } = useContext(Context)
@@ -24,6 +26,8 @@ const Title = () => {
             {showAccMenu && <AccountMenu close={() => setShowAcc(false)} />}
             {state.modal === 'create' && <CreateAccount close={()=>dispatch({type:'SET_MODAL',payload:null})}/>}
             {state.modal === 'info' && <AccountInfo close={()=>dispatch({type:'SET_MODAL',payload:null})}/>}
+            {state.modal === 'delete' && <DeleteAccount close={()=>dispatch({type:'SET_MODAL',payload:null})}/>}
+            {state.modal === 'rename' && <RenameAccount close={()=>dispatch({type:'SET_MODAL',payload:null})}/>}
             {/* {state.modal === 'create' && <CreateAccount close={()=>dispatch({type:'SET_MODAL',payload:null})}/>}
             {state.modal === 'create' && <CreateAccount close={()=>dispatch({type:'SET_MODAL',payload:null})}/>} */}
         </div>
