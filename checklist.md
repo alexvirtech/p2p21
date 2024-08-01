@@ -5,10 +5,12 @@
 - account management
     //- menu
     //- info
-    - rename
-    - change password
-    /- new (check if exists)
-    - delete
+    //- rename
+    //- change password
+    //- new (check if exists)
+    //- delete
+    - backup
+    - restore
 - projects 
     - edit 
     - invite participants
