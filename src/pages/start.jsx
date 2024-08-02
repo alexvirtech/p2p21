@@ -19,11 +19,18 @@ const Start = () => {
         }
     }, [])    
 
+    useEffect(() => {
+        if (state.recipient && peer) {
+            connect(state.recipient)
+        }
+    }, [state.recipient, peer])
+
     return (
         <div class="h-full  w-full">
             <div class="flex justify-between gap-8 w-full h-full px-8 py-4">
                 <div class="h-full w-1/2 flex justify-center items-center">
                     <Video stream={state.localStream} name="my video" />
+                    {state.remoteStream && <Video stream={state.remoteStream} name="my video" />}
                 </div>
                 <div class="h-full w-1/2 border border-gray-400 rounded-md">
                     {state.mode ? <div>{state.mode}</div> : <InviteButtons />}

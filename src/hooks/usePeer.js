@@ -204,5 +204,15 @@ export const usePeer = (dispatch, state) => {
         }
     }, [peer])
 
+    // Handle account changes by disconnecting and reconnecting
+    useEffect(() => {
+        if (peer) {
+            disconnect() // Disconnect the current peer
+            if (state.account) {
+                initPeer(state.account.wallet.publicKey) // Recreate the peer with the new account
+            }
+        }
+    }, [state.account])
+
     return { peer, message, connect, disconnect }
 }
