@@ -1,11 +1,13 @@
 import { defAccount } from "./common"
 import { encrypt, decrypt } from "./crypto"
+//import { invType } from "./common"
 
 export const InitState = {
     accounts: [],
     account: null, //defAccount,
     tempAcc: null,
     modal: null,
+    mode: null, //
     page: "Start",
     tabs: ["Dashboard", "Screen", "Whiteboard", "Documents"],
     tab: "Dashboard",
@@ -31,10 +33,6 @@ export const reducer = (state, action) => {
             return { ...state, account: selected2 }
         case "SET_ACCOUNT":
             return { ...state, account: action.payload }
-        /* case "SET_ACCOUNT_BY_NAME":
-            const selected4 = state.accounts.find((a) => a.name === action.payload)
-            const w = action.payload === defAccount ? selected4.wallet : JSON.parse(decrypt(selected4.encWallet, action.password))
-            return { ...state, account: w } */
         case "DELETE_ACCOUNT":
             const updatedAcc = state.accounts.filter((a) => a.name !== state.account.name)
             const selected3 = state.accounts.find((a) => a.name === defAccount)
@@ -56,6 +54,8 @@ export const reducer = (state, action) => {
             return { ...state, page: action.payload }
         case "SET_MODAL":
             return { ...state, modal: action.payload }
+        case "SET_MODE":
+            return { ...state, mode: action.payload }
         case "SET_TEMPLATE":
             return { ...state, template: action.payload }
         case "SET_PEER":
@@ -75,6 +75,8 @@ export const reducer = (state, action) => {
             return { ...state, messages: [...state.messages, action.payload] }
         case "SET_TEMP_STREAM":
             return { ...state, tempStream: action.payload }
+        case "SET_RECIPIENT":
+            return { ...state, recipient: action.payload }
         default:
             return state
     }

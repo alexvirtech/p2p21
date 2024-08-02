@@ -3,7 +3,7 @@ import { Peer } from "peerjs"
 import { peerConfig } from "../utils/config"
 import { useStream } from "./useStream"
 
-export const usePeer = (myId, dispatch, state) => {
+export const usePeer = (dispatch, state) => {
     const [peer, setPeer] = useState(null)
     const [conn, setConn] = useState(null)
     const [call, setCall] = useState(null)
@@ -12,8 +12,9 @@ export const usePeer = (myId, dispatch, state) => {
     const { localStream } = useStream("video")
 
     useEffect(() => {
+        if (!state.account) return
         initPeer()
-    }, [])
+    }, [state.account])
 
     useEffect(() => {
         if (localStream) {
@@ -22,13 +23,20 @@ export const usePeer = (myId, dispatch, state) => {
     }, [localStream])
 
     const initPeer = async () => {
+        if (peer && peer.open) {
+            console.log("Peer already exists")
+            return
+        }
+
         try {
-            const pr = myId ? new Peer(myId, peerConfig) : new Peer(peerConfig)
+            const pr = new Peer(state.account.wallet.publicKey, peerConfig)
             setPeer(pr)
+
             pr.on("open", (id) => {
                 dispatch({ type: "SET_PEER", payload: { peer: pr } })
                 console.log("Peer ID:", id)
             })
+
             pr.on("call", (incomingCall) => {
                 console.log("Incoming call")
                 dispatch({ type: "SET_PEER", payload: { call: incomingCall } })
@@ -44,14 +52,25 @@ export const usePeer = (myId, dispatch, state) => {
                     dispatch({ type: "SET_PEER", payload: { remoteStream: stream } })
                 }
             })
+
             pr.on("connection", (connection) => {
                 setConn(connection)
                 connection.on("data", (data) => {
                     //handleData(data)
                 })
             })
+
+            pr.on("disconnected", () => {
+                console.log("Peer disconnected. Attempting to reconnect...")
+                pr.reconnect()
+            })
+
             pr.on("error", (err) => {
                 console.error("Peer error:", err)
+                if (err.type === "unavailable-id") {
+                    console.log("ID is taken. Attempting to reconnect...")
+                    pr.reconnect()
+                }
             })
         } catch (error) {
             console.error("Error creating peer:", error)
@@ -93,12 +112,15 @@ export const usePeer = (myId, dispatch, state) => {
             const updatedTracks = cn.peerConnection.getSenders().map((sender) => sender.track?.kind)
             console.log("Existing tracks after adding: ", updatedTracks)
         })
+
         conn.on("data", (data) => {
             handleData(data)
         })
+
         conn.on("close", () => {
             disconnect()
         })
+
         conn.on("error", (err) => {
             console.error("Connection error:", err)
         })
@@ -123,7 +145,6 @@ export const usePeer = (myId, dispatch, state) => {
             dispatch({ type: "SET_PEER", payload: { remoteStream: stream } })
         }
 
-        // Ensure tracks are added to the call
         if (localStream) {
             localStream.getTracks().forEach((track) => {
                 const sender = call.peerConnection.getSenders().find((s) => s.track?.kind === track.kind)
@@ -161,10 +182,27 @@ export const usePeer = (myId, dispatch, state) => {
             stopSharedScreen()
         } else if (data.type === "set_tab") {
             dispatch({ type: "SET_TAB", payload: { tab: data.payload, isReceiver: true } })
-        } else if(data.type === 'msg'){
-            dispatch({ type: "ADD_MESSAGE", payload: {message:data.payload,isMine: false} })
+        } else if (data.type === "msg") {
+            dispatch({ type: "ADD_MESSAGE", payload: { message: data.payload, isMine: false } })
         }
     }
+
+    useEffect(() => {
+        const handleUnload = () => {
+            if (peer) {
+                peer.destroy()
+            }
+        }
+
+        window.addEventListener("beforeunload", handleUnload)
+
+        return () => {
+            window.removeEventListener("beforeunload", handleUnload)
+            if (peer) {
+                peer.destroy()
+            }
+        }
+    }, [peer])
 
     return { peer, message, connect, disconnect }
 }

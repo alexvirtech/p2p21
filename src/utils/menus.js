@@ -9,7 +9,8 @@ export const pages = [
     /* { label: "Groups" },
     { label: "Projects" }, */
     { label: "History" },
-    { label: "Settings" }
+    { label: "Settings" },
+    { label: "About" }
 ]
 
 // account menu

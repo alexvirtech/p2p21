@@ -9,13 +9,14 @@ import DeleteAccount from "../modals/deleteAccount"
 import RenameAccount from "../modals/renameAccount"
 import ChangePassword from "../modals/changePassword"
 import RestoreAccount from "../modals/restoreAccount"
+//import Router,{route} from "preact-router"
 //import { defAccount } from "../utils/common"
 
 const Title = () => {
     const { state, dispatch } = useContext(Context)
     const [showMainMenu, setShowMain] = useState(false)
     const [showAccMenu, setShowAcc] = useState(false)
-
+    
     /* useEffect(() => {
         if(!state.account.name){    
             const acc = state.accounts.find((a) => a.name === defAccount)   
