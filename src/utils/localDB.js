@@ -1,16 +1,15 @@
-import { defAccount } from "./common"
+import { defAccount, testIfOpened } from "./common"
 import { createAccount } from "./account"
 import { encrypt, decrypt } from "./crypto"
 import { downloadJSON } from "./utils"
 
 export const ifAccountExists = (name) => {
     const acc = JSON.parse(localStorage.getItem("accounts"))
-    const ex = acc.find((a) => a.name === name) ? true : false
+    const ex = acc.find((a) => a.name === name.trim()) ? true : false
     return ex
 }
 
-export const getAccounts = () => {
-    //localStorage.removeItem("accounts")
+export const getAccounts = () => {    
     const acc = localStorage.getItem("accounts")
     if (!acc) {
         // crate default account
@@ -27,45 +26,46 @@ export const getAccounts = () => {
 
 export const addAccount = (account) => {
     const acc = getAccounts()
-    acc.push(account)
+    const a = {...account, name: account.name.trim()}
+    acc.push(a)
     localStorage.setItem("accounts", JSON.stringify(acc))
 }
 
 export const deleteAccountByName = (name, password) => {
-    if (name === defAccount) return "Default account cannot be deleted"
+    if (name.trim() === defAccount) return "Default account cannot be deleted"
     const acc = getAccounts()
-    const del = acc.find((a) => a.name === name)
-    const wallet = decrypt(del.encWallet, password)
+    const del = acc.find((a) => a.name.trim() === name.trim())
+    const wallet = testIfOpened(name) ? del.wallet : decrypt(del.encWallet, password)
     if (!wallet) return "Wrong password"
-    const updatedAcc = acc.filter((a) => a.name !== name)
+    const updatedAcc = acc.filter((a) => a.name !== name.trim())
     localStorage.setItem("accounts", JSON.stringify(updatedAcc))
     return null
 }
 
 export const renameAccount = (name, newName, password) => {
-    if (name === defAccount) return "Default account cannot be renamed"
+    if (name.trim() === defAccount) return "Default account cannot be renamed"
     const acc = getAccounts()
-    const ren = acc.find((a) => a.name === name)
-    const wallet = decrypt(ren.encWallet, password)
+    const ren = acc.find((a) => a.name === name.trim())
+    const wallet = testIfOpened(name) ? ren.wallet : decrypt(ren.encWallet, password)
     if (!wallet) return "Wrong password"
 
     const updatedAcc = acc.map((a) => {
-        return a.name === name ? { ...a, name: newName } : a
+        return a.name === name.trim() ? { ...a, name: newName.trim() } : a
     })
     localStorage.setItem("accounts", JSON.stringify(updatedAcc))
     return null
 }
 
 export const changeAccountPassword = (name, newPassword, password) => {
-    if (name === defAccount) return "Default account has not password"
+    if (name.trim() === defAccount) return "Default account has not password"
     const acc = getAccounts()
-    const ren = acc.find((a) => a.name === name)
-    const wallet = decrypt(ren.encWallet, password)
+    const ren = acc.find((a) => a.name === name.trim())
+    const wallet = testIfOpened(name) ? ren.wallet : decrypt(ren.encWallet, password)
     if (!wallet) return "Wrong password"
 
     const { publicKey, privateKey, mnemonic } = wallet
     const updatedAcc = acc.map((a) => {
-        return a.name === name
+        return a.name === name.trim()
             ? { ...a, encWallet: encrypt(JSON.stringify({ publicKey, privateKey, mnemonic }), newPassword) }
             : a
     })
@@ -75,8 +75,8 @@ export const changeAccountPassword = (name, newPassword, password) => {
 
 export const getAccountBackup = (name) => {
     const acc = JSON.parse(localStorage.getItem("accounts"))
-    const ex = acc.find((a) => a.name === name)
-    downloadJSON(ex, `account_${name}.json`)
+    const ex = acc.find((a) => a.name === name.trim())
+    downloadJSON(ex, `account_${name.trim()}.json`)
 }
 
 export const restoreAccount = (data,password) => {
@@ -87,7 +87,7 @@ export const restoreAccount = (data,password) => {
         const accounts = JSON.parse(localStorage.getItem("accounts"))
         const ex = accounts.find((a) => a.name === name)
         if (ex) return "This name exists, change the name in json and try again."
-        const wallet = decrypt(acc.encWallet, password)
+        const wallet = testIfOpened(name) ? acc.wallet : decrypt(acc.encWallet, password)
         if(!wallet) return "Wrong password"
         accounts.push(acc)
         localStorage.setItem("accounts", JSON.stringify(accounts))

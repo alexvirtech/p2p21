@@ -29,11 +29,12 @@ export const reducer = (state, action) => {
         case "ADD_ACCOUNT":
             return { ...state, accounts: [...state.accounts, action.payload], account: action.payload }
         case "SET_DEF_ACCOUNT":
-            const selected2 = state.accounts.find((a) => a.name === defAccount)
+            const selected2 = action.payload ?? state.accounts.find((a) => a.name === defAccount)
             return { ...state, account: selected2 }
         case "SET_ACCOUNT":
             return { ...state, account: action.payload }
         case "DELETE_ACCOUNT":
+            if(state.account.name === defAccount) return state
             const updatedAcc = state.accounts.filter((a) => a.name !== state.account.name)
             const selected3 = state.accounts.find((a) => a.name === defAccount)
             return { ...state, accounts: updatedAcc, account: selected3 }

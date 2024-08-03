@@ -10,6 +10,7 @@ export const usePeer = (dispatch, state) => {
     const [message, setMessage] = useState("")
     const [remoteStream, setRemoteStream] = useState(null)
     const { localStream } = useStream("video")
+    const {altId,setAltId} = useState(null)
 
     useEffect(() => {
         if (!state.account) return
@@ -22,14 +23,14 @@ export const usePeer = (dispatch, state) => {
         }
     }, [localStream])
 
-    const initPeer = async () => {
+    const initPeer = async (id = null) => { // id is used for development environment when running a number of peers in one device
         if (peer && peer.open) {
             console.log("Peer already exists")
             return
         }
 
         try {
-            const pr = new Peer(state.account.wallet.publicKey, peerConfig)
+            const pr = new Peer(id ?? state.account.wallet.publicKey, peerConfig)
             setPeer(pr)
 
             pr.on("open", (id) => {
@@ -69,7 +70,11 @@ export const usePeer = (dispatch, state) => {
                 console.error("Peer error:", err)
                 if (err.type === "unavailable-id") {
                     console.log("ID is taken. Attempting to reconnect...")
-                    pr.reconnect()
+                    // for development environment when running a number of peers in one device
+
+                    //pr.reconnect()
+                }else{
+                    console.log("Peer error:", err)
                 }
             })
         } catch (error) {
@@ -214,5 +219,5 @@ export const usePeer = (dispatch, state) => {
         }
     }, [state.account])
 
-    return { peer, message, connect, disconnect }
+    return { peer, message, connect, disconnect, altId }
 }

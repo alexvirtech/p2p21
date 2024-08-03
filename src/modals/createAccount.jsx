@@ -5,36 +5,48 @@ import { createAccount } from "../utils/account"
 import { useRef } from "preact/hooks"
 import { encrypt } from "../utils/crypto"
 import { addAccount, ifAccountExists } from "../utils/localDB"
+import { defAccount, testIfOpened } from "../utils/common"
 
 export default function CreateAccount({ close }) {
     const { state, dispatch } = useContext(Context)
-    const name = useRef()
+    const nameInput = useRef()
+    const [name, setName] = useState("")
+    const [isOpened, setIsOpened] = useState(false)
     const password = useRef()
     const confirmPassword = useRef()
     const [error, setError] = useState("")
 
     useEffect(() => {
-        name.current.value = ''   
-        name.current.focus()
+        nameInput.current.value = ""
+        nameInput.current.focus()
     }, [])
+
+    useEffect(() => {
+        if (name !== "") setIsOpened(testIfOpened(name))
+    }, [name])
 
     const handleSubmit = (e) => {
         e.preventDefault()
-        if (ifAccountExists(name.current.value)) {
-            setError("Account already exists")
+        if (name.trim() === defAccount) {
+            setError("Account already exists and cannot be recreated")
             return
         }
         const { publicKey, privateKey, mnemonic } = createAccount()
         const acc1 = {
-            name: name.current.value,
+            name,
             wallet: { publicKey, privateKey, mnemonic: mnemonic.phrase },
         }
         dispatch({ type: "ADD_ACCOUNT", payload: acc1 })
-        const acc2 = {
-            name: name.current.value,
-            encWallet: encrypt(JSON.stringify({ publicKey, privateKey, mnemonic: mnemonic.phrase }), password.current.value),
+        if(testIfOpened(name)) {
+            addAccount(acc1)
+        }else{
+            const acc2 = {
+                name,
+                encWallet: encrypt(JSON.stringify({ publicKey, privateKey, mnemonic: mnemonic.phrase }), password.current.value),
+            }
+            addAccount(acc2)
         }
-        addAccount(acc2)
+        
         close()
     }
 
@@ -51,23 +63,42 @@ export default function CreateAccount({ close }) {
             <form onSubmit={handleSubmit}>
                 <div>Account name</div>
                 <div>
-                    <input class="w-full border border-slate-400 rounded py-1.5 px-4" required ref={name} />
-                </div>
-                <div class="pt-3">Password</div>
-                <div>
-                    <input class="w-full border border-slate-400 rounded py-1.5 px-4" type="password" required ref={password} />
-                </div>
-                <div class="pt-3">Confirm password</div>
-                <div>
                     <input
                         class="w-full border border-slate-400 rounded py-1.5 px-4"
-                        type="password"
                         required
-                        ref={confirmPassword}
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        ref={nameInput}
                     />
                 </div>
+                {isOpened ? (
+                    <div>Account names starting with 'Default' do not require a password.</div>
+                ) : (
+                    <>
+                        <div class="pt-3">Password</div>
+                        <div>
+                            <input
+                                class="w-full border border-slate-400 rounded py-1.5 px-4"
+                                type="password"
+                                required={!isOpened}
+                                ref={password}
+                            />
+                        </div>
+                        <div class="pt-3">Confirm password</div>
+                        <div>
+                            <input
+                                class="w-full border border-slate-400 rounded py-1.5 px-4"
+                                type="password"
+                                required={!isOpened}
+                                ref={confirmPassword}
+                            />
+                        </div>
+                    </>
+                )}
                 <div class="pt-1 flex justify-start gap-4">
-                    <button class="bg-blue-500 text-white rounded py-1.5 px-8 my-4 cursor-pointer" type="submit">Create</button>
+                    <button class="bg-blue-500 text-white rounded py-1.5 px-8 my-4 cursor-pointer" type="submit">
+                        Create
+                    </button>
                     <div class="text-red-600 my-5 text-xs">{error}</div>
                 </div>
             </form>

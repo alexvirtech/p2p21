@@ -17,8 +17,8 @@ export default function LayoutModalWithPassword({
     const handleSubmit = (e) => {
         e.preventDefault()
         //close(password.current.value)
-        const acc = state.accounts.find((a) => a.name === state.account)
-        const wallet = decrypt(localStorage.getItem("wallet"), password.current.value)
+        //const acc = state.accounts.find((a) => a.name === state.account)
+        //const wallet = decrypt(localStorage.getItem("wallet"), password.current.value)
     }
 
     return (

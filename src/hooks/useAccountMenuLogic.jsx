@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "preact/hooks"
+import { testIfOpened } from "../utils/common"
 
 const useAccountMenuLogic = (defAccount, state, dispatch) => {
     const [selectedAccount, setSelectedAccount] = useState(state.account.name)
@@ -12,9 +13,11 @@ const useAccountMenuLogic = (defAccount, state, dispatch) => {
 
     const handleAccountChange = (e) => {
         const newAccount = e.target.value
-        if (newAccount === defAccount) {
-            setSelectedAccount(defAccount)
-            dispatch({ type: "SET_DEF_ACCOUNT"})
+        if (testIfOpened(newAccount)) {
+            setSelectedAccount(newAccount)
+            const acc = state.accounts.find((a) => a.name === newAccount)
+            //const wallet = acc.wallet ?? decrypt(acc.encWallet, password.current.value)
+            dispatch({ type: "SET_DEF_ACCOUNT", payload: newAccount.name === defAccount ? null : acc })  
         } else {
             dispatch({ type: "SET_MODAL", payload: "password" })
         }

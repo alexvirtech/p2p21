@@ -2,7 +2,7 @@ import { useState, useEffect, useContext, useRef } from "preact/hooks"
 import { Context } from "../utils/context"
 import LayoutModal from "../layouts/layoutModal"
 import { restoreAccount } from "../utils/localDB"
-import { defAccount } from "../utils/common"
+import { defAccount, testIfOpened } from "../utils/common"
 import { decrypt } from "../utils/crypto"
 
 export default function RestoreAccount({ close }) {
@@ -24,7 +24,7 @@ export default function RestoreAccount({ close }) {
             return
         }        
         const acc = JSON.parse(backup.current.value)
-        const wallet = JSON.parse(decrypt(acc.encWallet, password.current.value))
+        const wallet = testIfOpened(acc.name) ?  acc.wallet : JSON.parse(decrypt(acc.encWallet, password.current.value))
         const account = {
             name: acc.name,
             wallet: wallet

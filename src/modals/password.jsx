@@ -20,7 +20,7 @@ export default function Password({ name, title, close = () => {}, width = "w-[90
         e.preventDefault()
         try {
             const acc = state.accounts.find((a) => a.name === name)
-            const wallet = acc.walle ?? decrypt(acc.encWallet, password.current.value)
+            const wallet = acc.wallet ?? decrypt(acc.encWallet, password.current.value)
             if (wallet) {
                 dispatch({ type: "SET_ACCOUNT", payload: { name, wallet: JSON.parse(wallet) } })
                 closeModal()

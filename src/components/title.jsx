@@ -9,20 +9,11 @@ import DeleteAccount from "../modals/deleteAccount"
 import RenameAccount from "../modals/renameAccount"
 import ChangePassword from "../modals/changePassword"
 import RestoreAccount from "../modals/restoreAccount"
-//import Router,{route} from "preact-router"
-//import { defAccount } from "../utils/common"
 
 const Title = () => {
     const { state, dispatch } = useContext(Context)
     const [showMainMenu, setShowMain] = useState(false)
     const [showAccMenu, setShowAcc] = useState(false)
-    
-    /* useEffect(() => {
-        if(!state.account.name){    
-            const acc = state.accounts.find((a) => a.name === defAccount)   
-            dispatch({ type: "SET_ACCOUNT", payload: { name:defAccount, wallet: acc.wallet } })            
-        }        
-    }, [state.account.name]) */
 
     return (
         <div class="border-b border-gray-500 flex justify-between relative items-center h-16">
@@ -40,9 +31,7 @@ const Title = () => {
             {state.modal === 'delete' && <DeleteAccount close={()=>dispatch({type:'SET_MODAL',payload:null})}/>}
             {state.modal === 'rename' && <RenameAccount close={()=>dispatch({type:'SET_MODAL',payload:null})}/>}
             {state.modal === 'changePassword' && <ChangePassword close={()=>dispatch({type:'SET_MODAL',payload:null})}/>}
-            {state.modal === 'restore' && <RestoreAccount close={()=>dispatch({type:'SET_MODAL',payload:null})}/>}
-            {/* {state.modal === 'create' && <CreateAccount close={()=>dispatch({type:'SET_MODAL',payload:null})}/>}
-            {state.modal === 'create' && <CreateAccount close={()=>dispatch({type:'SET_MODAL',payload:null})}/>} */}
+            {state.modal === 'restore' && <RestoreAccount close={()=>dispatch({type:'SET_MODAL',payload:null})}/>}           
         </div>
     )
 }
