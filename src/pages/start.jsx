@@ -8,7 +8,7 @@ import useQueryParams from "../hooks/useQueryParams"
 import InviteButtons from "../components/inviteButtons"
 
 const Start = () => {
-    const { state, dispatch } = useContext(Context)
+    const { state, dispatch } = useContext(Context)   
     const { peer, message, connect, disconnect } = usePeer(dispatch, state)    
     const {id,tp} = useQueryParams()
 

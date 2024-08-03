@@ -9,7 +9,10 @@ export const ifAccountExists = (name) => {
     return ex
 }
 
-export const getAccounts = () => {    
+export const getAccounts = (withClear = false) => {   
+    if(withClear) {
+        localStorage.removeItem("accounts")
+    }
     const acc = localStorage.getItem("accounts")
     if (!acc) {
         // crate default account

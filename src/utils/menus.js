@@ -21,5 +21,5 @@ export const actions = [
     { label: "Create New Account", action: "create",custom:true,border:true },
     { label: "Backup Account", action: "backup",custom:true, func: (a)=>getAccountBackup(a)},    
     { label: "Restore Account", action: "restore",custom:true,border:true },    
-    { label: "Delete Account", action: "delete",custom:false }
+    { label: "Delete Account", action: "delete",custom:false, special: true }
 ]

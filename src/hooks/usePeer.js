@@ -10,10 +10,13 @@ export const usePeer = (dispatch, state) => {
     const [message, setMessage] = useState("")
     const [remoteStream, setRemoteStream] = useState(null)
     const { localStream } = useStream("video")
-    const {altId,setAltId} = useState(null)
+    const {altId,setAltId} = useState(null)    
 
     useEffect(() => {
         if (!state.account) return
+        /* if(peer && peer?.id !== state.account.wallet.publicKey){
+            disconnect()
+        }     */    
         initPeer()
     }, [state.account])
 
@@ -24,14 +27,14 @@ export const usePeer = (dispatch, state) => {
     }, [localStream])
 
     const initPeer = async (id = null) => { // id is used for development environment when running a number of peers in one device
-        if (peer && peer.open) {
+        if (peer && peer.open && peer.id !== state.account.wallet.publicKey) {
             console.log("Peer already exists")
             return
         }
 
         try {
             const pr = new Peer(id ?? state.account.wallet.publicKey, peerConfig)
-            setPeer(pr)
+            //setPeer(pr)
 
             pr.on("open", (id) => {
                 dispatch({ type: "SET_PEER", payload: { peer: pr } })
@@ -67,16 +70,22 @@ export const usePeer = (dispatch, state) => {
             })
 
             pr.on("error", (err) => {
-                console.error("Peer error:", err)
                 if (err.type === "unavailable-id") {
                     console.log("ID is taken. Attempting to reconnect...")
                     // for development environment when running a number of peers in one device
-
+                    const next = nextAccount()
+                    if(next){
+                        dispatch({ type: "SET_ACCOUNT_BY_NAME", payload: next })
+                    }else{
+                        console.log("Peer error:","No more accounts to try")
+                    }
                     //pr.reconnect()
                 }else{
                     console.log("Peer error:", err)
                 }
             })
+
+            setPeer(pr)
         } catch (error) {
             console.error("Error creating peer:", error)
         }
@@ -218,6 +227,17 @@ export const usePeer = (dispatch, state) => {
             }
         }
     }, [state.account])
+
+    // temp - for development environment when running a number of peers in one device
+    const nextAccount = ()=>{
+        const ac = ['Default','Default 1','Default 2','Default 3','Default 4']
+        const index = ac.indexOf(state.account.name)
+        if(index < ac.length - 1){
+            return ac[index+1]
+        }else{
+            return null
+        }
+    }
 
     return { peer, message, connect, disconnect, altId }
 }

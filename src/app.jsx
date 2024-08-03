@@ -26,7 +26,8 @@ export function App() {
     //const { isControlled, passControl } = useControl()
 
     useEffect(() => {
-        const acc = getAccounts()
+        const withClear = false // true is for development, must be false in production
+        const acc = getAccounts(withClear)
         dispatch({ type: "SET_ACCOUNTS", payload: acc })
     }, [])
 

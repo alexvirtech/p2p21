@@ -2,14 +2,16 @@ import { useState, useRef, useEffect } from "preact/hooks"
 import { testIfOpened } from "../utils/common"
 
 const useAccountMenuLogic = (defAccount, state, dispatch) => {
-    const [selectedAccount, setSelectedAccount] = useState(state.account.name)
+    const [selectedAccount, setSelectedAccount] = useState()
     const tempName = useRef(null)
 
     useEffect(() => {
-        if(state.account.name){
+        if(state.account?.name){
             setSelectedAccount(state.account.name)    
+        }else{
+            setSelectedAccount(defAccount)
         }
-    }, [state.account.name])
+    }, [state.account?.name])
 
     const handleAccountChange = (e) => {
         const newAccount = e.target.value

@@ -3,7 +3,7 @@ import { useContext } from "preact/hooks"
 import { Context } from "../utils/context"
 import { SelectedIcon } from "../utils/icons"
 import { actions } from "../utils/menus"
-import { defAccount } from "../utils/common"
+import { defAccount, testIfOpened } from "../utils/common"
 import Password from "../modals/password"
 import useAccountMenuLogic from "../hooks/useAccountMenuLogic"
 
@@ -24,6 +24,11 @@ const AccountMenu = ({ close }) => {
         close()
     }
 
+    const changeAccount = (e) => {
+        handleAccountChange(e)
+        close()
+    }
+
     return (
         <LayoutMenu title="123" close={close}>
             <div class="flex flex-col w-64 bg-gray-800 absolute right-0 top-16 z-10">
@@ -32,7 +37,7 @@ const AccountMenu = ({ close }) => {
                     <div>
                         <select
                             class="bg-gray-600 text-white text-2xl w-full border border-slate-400 px-2 py-1 rounded text-center"
-                            onChange={handleAccountChange}
+                            onChange={changeAccount}
                             ref={tempName}
                             value={selectedAccount}
                         >
@@ -46,7 +51,7 @@ const AccountMenu = ({ close }) => {
                 </div>
                 {actions.map((item, index) => (
                     <>
-                        {(selectedAccount !== defAccount || item.custom) && (
+                        {(!testIfOpened(selectedAccount) || item.custom || (item.action === "delete" && selectedAccount !== defAccount)) && (
                             <div class="hover:bg-gray-700" key={index} onClick={() => handleClick(item)}>
                                 <div
                                     class={`cursor-pointer flex justify-center gap-1 items-center h-16 border-b border-gray-700 ${
