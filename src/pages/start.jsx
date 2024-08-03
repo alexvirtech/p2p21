@@ -28,7 +28,7 @@ const Start = () => {
     return (
         <div class="h-full  w-full">
             <div class="flex justify-between gap-8 w-full h-full px-8 py-4">
-                <div class="h-full w-1/2 flex justify-center items-center">
+                <div class={`${state.mode ? 'h-1/2' : 'h-full'} w-1/2 flex justify-center items-center gap-2`}>
                     <Video stream={state.localStream} name="my video" />
                     {state.remoteStream && <Video stream={state.remoteStream} name="my video" />}
                 </div>

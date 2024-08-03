@@ -2,6 +2,7 @@ import { useEffect, useState } from "preact/hooks"
 import { Peer } from "peerjs"
 import { peerConfig } from "../utils/config"
 import { useStream } from "./useStream"
+import { invType } from "../utils/common"
 
 export const usePeer = (dispatch, state) => {
     const [peer, setPeer] = useState(null)
@@ -10,14 +11,20 @@ export const usePeer = (dispatch, state) => {
     const [message, setMessage] = useState("")
     const [remoteStream, setRemoteStream] = useState(null)
     const { localStream } = useStream("video")
-    const {altId,setAltId} = useState(null)    
+
+    const accounts = ["Default", "Default 1", "Default 2", "Default 3", "Default 4"]  // List of predefined accounts
 
     useEffect(() => {
-        if (!state.account) return
-        /* if(peer && peer?.id !== state.account.wallet.publicKey){
-            disconnect()
-        }     */    
-        initPeer()
+        if (peer) {
+            console.log(`Destroying peer for account: ${peer.id}`)
+            peer.destroy()
+            setPeer(null)
+        }
+
+        if (state.account) {
+            console.log(`Initializing peer for account: ${state.account.name}`)
+            initPeer(state.account.wallet.publicKey)
+        }
     }, [state.account])
 
     useEffect(() => {
@@ -26,17 +33,12 @@ export const usePeer = (dispatch, state) => {
         }
     }, [localStream])
 
-    const initPeer = async (id = null) => { // id is used for development environment when running a number of peers in one device
-        if (peer && peer.open && peer.id !== state.account.wallet.publicKey) {
-            console.log("Peer already exists")
-            return
-        }
-
+    const initPeer = async (id) => {
         try {
-            const pr = new Peer(id ?? state.account.wallet.publicKey, peerConfig)
-            //setPeer(pr)
+            const pr = new Peer(id, peerConfig)
 
             pr.on("open", (id) => {
+                setPeer(pr)
                 dispatch({ type: "SET_PEER", payload: { peer: pr } })
                 console.log("Peer ID:", id)
             })
@@ -49,45 +51,41 @@ export const usePeer = (dispatch, state) => {
                     setRemoteStream(remoteStream)
                     dispatch({ type: "SET_PEER", payload: { remoteStream } })
                 })
-                incomingCall.peerConnection.ontrack = (event) => {
-                    console.log("Track event received on incoming call")
-                    const [stream] = event.streams
-                    setRemoteStream(stream)
-                    dispatch({ type: "SET_PEER", payload: { remoteStream: stream } })
-                }
             })
 
             pr.on("connection", (connection) => {
                 setConn(connection)
                 connection.on("data", (data) => {
-                    //handleData(data)
+                    // handleData(data)
                 })
             })
 
             pr.on("disconnected", () => {
-                console.log("Peer disconnected. Attempting to reconnect...")
-                pr.reconnect()
+                console.log("Peer disconnected. Not attempting to reconnect because peer is destroyed.")
             })
 
             pr.on("error", (err) => {
                 if (err.type === "unavailable-id") {
-                    console.log("ID is taken. Attempting to reconnect...")
-                    // for development environment when running a number of peers in one device
-                    const next = nextAccount()
-                    if(next){
-                        dispatch({ type: "SET_ACCOUNT_BY_NAME", payload: next })
-                    }else{
-                        console.log("Peer error:","No more accounts to try")
-                    }
-                    //pr.reconnect()
-                }else{
+                    console.log("ID is taken. Switching to the next account...")
+                    switchToNextAccount()
+                } else {
                     console.log("Peer error:", err)
                 }
             })
 
-            setPeer(pr)
         } catch (error) {
             console.error("Error creating peer:", error)
+        }
+    }
+
+    const switchToNextAccount = () => {
+        const currentIndex = accounts.indexOf(state.account.name)
+        if (currentIndex !== -1 && currentIndex < accounts.length - 1) {
+            const nextAccountName = accounts[currentIndex + 1]
+            console.log(`Switching to account: ${nextAccountName}`)
+            dispatch({ type: "SET_ACCOUNT_BY_NAME", payload: nextAccountName })
+        } else {
+            console.log("No more accounts available to switch to.")
         }
     }
 
@@ -99,32 +97,14 @@ export const usePeer = (dispatch, state) => {
             const cn = peer.call(conn.peer, localStream)
             setCall(cn)
             dispatch({ type: "SET_PEER", payload: { call: cn } })
+            dispatch({type:'SET_MODAL',payload: null}) 
+            dispatch({type:'SET_MODE',payload: invType.Basic}) // temp
 
             cn.peerConnection.ontrack = (event) => {
-                console.log("Track event received on outgoing call")
                 const [stream] = event.streams
                 setRemoteStream(stream)
                 dispatch({ type: "SET_PEER", payload: { remoteStream: stream } })
             }
-
-            const existingTracks = cn.peerConnection.getSenders().map((sender) => sender.track?.kind)
-            console.log("Existing tracks before adding: ", existingTracks)
-
-            localStream.getTracks().forEach((track) => {
-                if (!existingTracks.includes(track.kind)) {
-                    console.log(`Adding track: ${track.kind}`)
-                    try {
-                        cn.peerConnection.addTrack(track, localStream)
-                    } catch (error) {
-                        console.error(`Failed to add track: ${track.kind}`, error)
-                    }
-                } else {
-                    console.log(`Track already exists: ${track.kind}`)
-                }
-            })
-
-            const updatedTracks = cn.peerConnection.getSenders().map((sender) => sender.track?.kind)
-            console.log("Existing tracks after adding: ", updatedTracks)
         })
 
         conn.on("data", (data) => {
@@ -152,25 +132,7 @@ export const usePeer = (dispatch, state) => {
         call.on("error", (err) => {
             console.error("Call error:", err)
         })
-        call.peerConnection.ontrack = (event) => {
-            console.log("Track event received on call")
-            const [stream] = event.streams
-            setRemoteStream(stream)
-            dispatch({ type: "SET_PEER", payload: { remoteStream: stream } })
-        }
-
-        if (localStream) {
-            localStream.getTracks().forEach((track) => {
-                const sender = call.peerConnection.getSenders().find((s) => s.track?.kind === track.kind)
-                if (!sender) {
-                    console.log(`Adding missing track: ${track.kind}`)
-                    call.peerConnection.addTrack(track, localStream)
-                } else {
-                    console.log(`Track already added: ${track.kind}`)
-                }
-            })
-        }
-    }, [call, localStream])
+    }, [call])
 
     const connect = (recId) => {
         const connection = peer.connect(recId)
@@ -180,8 +142,13 @@ export const usePeer = (dispatch, state) => {
     const disconnect = () => {
         if (call) call.close()
         if (conn) conn.close()
+        if (peer) {
+            peer.destroy()
+            setPeer(null)
+        }
         setRemoteStream(null)
         dispatch({ type: "SET_PEER", payload: { remoteStream: null, peer: null, conn: null, call: null } })
+        dispatch({ type: "SET_MODE", payload: null })
     }
 
     const stopSharedScreen = () => {
@@ -218,26 +185,5 @@ export const usePeer = (dispatch, state) => {
         }
     }, [peer])
 
-    // Handle account changes by disconnecting and reconnecting
-    useEffect(() => {
-        if (peer) {
-            disconnect() // Disconnect the current peer
-            if (state.account) {
-                initPeer(state.account.wallet.publicKey) // Recreate the peer with the new account
-            }
-        }
-    }, [state.account])
-
-    // temp - for development environment when running a number of peers in one device
-    const nextAccount = ()=>{
-        const ac = ['Default','Default 1','Default 2','Default 3','Default 4']
-        const index = ac.indexOf(state.account.name)
-        if(index < ac.length - 1){
-            return ac[index+1]
-        }else{
-            return null
-        }
-    }
-
-    return { peer, message, connect, disconnect, altId }
+    return { peer, message, connect, disconnect }
 }
