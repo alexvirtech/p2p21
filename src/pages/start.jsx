@@ -40,7 +40,7 @@ const Start = () => {
                     </div>}
                 </div>
                 <div class="h-full w-1/2 border border-gray-400 rounded-md">
-                    {state.mode ? <div>{state.mode}</div> : <InviteButtons />}
+                    {state.mode ? <div class="p-4">{state.mode}</div> : <InviteButtons />}
                 </div>
             </div>
         </div>
