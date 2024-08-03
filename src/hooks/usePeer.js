@@ -8,11 +8,10 @@ export const usePeer = (dispatch, state) => {
     const [peer, setPeer] = useState(null)
     const [conn, setConn] = useState(null)
     const [call, setCall] = useState(null)
-    const [message, setMessage] = useState("")
     const [remoteStream, setRemoteStream] = useState(null)
     const { localStream } = useStream("video")
 
-    const accounts = ["Default", "Default 1", "Default 2", "Default 3", "Default 4"]  // List of predefined accounts
+    const accounts = ["Default", "Default 1", "Default 2", "Default 3", "Default 4"]
 
     useEffect(() => {
         if (peer) {
@@ -37,6 +36,25 @@ export const usePeer = (dispatch, state) => {
         try {
             const pr = new Peer(id, peerConfig)
 
+            // Add the custom disconnectRecipient function
+           /*  pr.disconnectRecipient = () => {
+                if (conn) {
+                    if (conn.open) {
+                        console.log("Sending disconnect message to recipient...")
+                        conn.send({ type: "disconnect" })  // Notify the recipient to disconnect
+                    } else {
+                        console.log("Connection is not open, retrying...")
+                        conn.on("open", () => {
+                            console.log("Connection opened, now sending disconnect message to recipient...")
+                            conn.send({ type: "disconnect" })  // Notify the recipient to disconnect
+                        })
+                    }
+                } else {
+                    console.log("Connection is not available to send disconnect message")
+                }
+                handleDisconnect()
+            } */
+
             pr.on("open", (id) => {
                 setPeer(pr)
                 dispatch({ type: "SET_PEER", payload: { peer: pr } })
@@ -55,8 +73,22 @@ export const usePeer = (dispatch, state) => {
 
             pr.on("connection", (connection) => {
                 setConn(connection)
+                console.log("Connection established with peer:", connection.peer)
+
+                // Check if the connection is immediately open
+                if (connection.open) {
+                    console.log("Connection is already open with peer:", connection.peer)
+                } else {
+                    console.log("Waiting for connection to open with peer:", connection.peer)
+                }
+
+                connection.on("open", () => {
+                    console.log("Connection is now open with peer:", connection.peer)
+                })
+
                 connection.on("data", (data) => {
-                    // handleData(data)
+                    console.log("Received data:", data)
+                    handleData(data)
                 })
             })
 
@@ -92,13 +124,13 @@ export const usePeer = (dispatch, state) => {
     useEffect(() => {
         if (!conn) return
         conn.on("open", () => {
-            console.log("Connection opened")
+            console.log("Connection opened with peer:", conn.peer)
             dispatch({ type: "SET_PEER", payload: { conn } })
             const cn = peer.call(conn.peer, localStream)
             setCall(cn)
             dispatch({ type: "SET_PEER", payload: { call: cn } })
-            dispatch({type:'SET_MODAL',payload: null}) 
-            dispatch({type:'SET_MODE',payload: invType.Basic}) // temp
+
+            dispatch({ type: "SET_MODE", payload: invType.Basic })
 
             cn.peerConnection.ontrack = (event) => {
                 const [stream] = event.streams
@@ -108,11 +140,13 @@ export const usePeer = (dispatch, state) => {
         })
 
         conn.on("data", (data) => {
+            console.log("Received data on connection:", data)
             handleData(data)
         })
 
         conn.on("close", () => {
-            disconnect()
+            console.log("Connection closed")
+            handleDisconnect()
         })
 
         conn.on("error", (err) => {
@@ -127,7 +161,8 @@ export const usePeer = (dispatch, state) => {
             dispatch({ type: "SET_PEER", payload: { remoteStream } })
         })
         call.on("close", () => {
-            disconnect()
+            console.log("Call closed")
+            handleDisconnect()
         })
         call.on("error", (err) => {
             console.error("Call error:", err)
@@ -135,20 +170,33 @@ export const usePeer = (dispatch, state) => {
     }, [call])
 
     const connect = (recId) => {
+        console.log("Attempting to connect to peer:", recId)
         const connection = peer.connect(recId)
         setConn(connection)
+
+        connection.on("open", () => {
+            console.log("Connection successfully opened to peer:", recId)
+        })
+
+        connection.on("error", (err) => {
+            console.error("Error during connection:", err)
+        })
     }
 
-    const disconnect = () => {
-        if (call) call.close()
-        if (conn) conn.close()
-        if (peer) {
-            peer.destroy()
-            setPeer(null)
+    const handleDisconnect = () => {
+        console.log("Handling disconnect...")
+        if (call) {
+            console.log("Closing call...")
+            call.close()
+        }
+        if (conn) {
+            console.log("Closing connection...")
+            conn.close()
         }
         setRemoteStream(null)
-        dispatch({ type: "SET_PEER", payload: { remoteStream: null, peer: null, conn: null, call: null } })
+        dispatch({ type: "SET_PEER", payload: { remoteStream: null, call: null, conn: null } })
         dispatch({ type: "SET_MODE", payload: null })
+        dispatch({ type: "SET_MODAL", payload: null })
     }
 
     const stopSharedScreen = () => {
@@ -159,7 +207,11 @@ export const usePeer = (dispatch, state) => {
     }
 
     const handleData = (data) => {
-        if (data.type === "stopScreen") {
+        console.log("Handling data:", data)
+        if (data.type === "disconnect") {
+            console.log("Disconnect message received")
+            handleDisconnect()  // Handle the disconnect notification
+        } else if (data.type === "stopScreen") {
             stopSharedScreen()
         } else if (data.type === "set_tab") {
             dispatch({ type: "SET_TAB", payload: { tab: data.payload, isReceiver: true } })
@@ -185,5 +237,5 @@ export const usePeer = (dispatch, state) => {
         }
     }, [peer])
 
-    return { peer, message, connect, disconnect }
+    return { peer, connect, disconnect: handleDisconnect, handleDisconnect }
 }
