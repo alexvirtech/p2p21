@@ -20,7 +20,7 @@ const Title = () => {
             <div class="py-3 px-6 cursor-pointer" onClick={() => setShowMain(true)}>
                 <MainMenuIcon />
             </div>
-            <h1 class="text-3xl flex justify-center py-2 text-slate-600 font-bold">ExtraSafe Communicator</h1>
+            <h1 class="text-xl xxxs:text-3xl flex justify-center py-2 text-slate-600 font-bold gap-2">ExtraSafe <div class="hidden mobile:inline">Communicator</div></h1>
             <div class="py-2 px-6 cursor-pointer" onClick={()=>setShowAcc(true)}>
                 <AccountIcon />
             </div>
