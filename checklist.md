@@ -1,7 +1,14 @@
 *** 31/07 ***
 //- main menu
 //- account menu
+- common layout inc menus
+    - responsivity
+    - dark/light theme
 - start page
+    - basic video messanger
+        - video
+        - text
+        - join by id or invitation link
 //- account management
     //- menu
     //- info
