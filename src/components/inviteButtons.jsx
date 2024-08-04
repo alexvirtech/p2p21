@@ -27,7 +27,7 @@ export default function InviteButtons() {
                         >
                             Basic
                         </button>
-                        <div class="text-sm">Peer-to-peer video and text chat for two participants.</div>
+                        <div class="text-[11px] tablet:text-sm">Peer-to-peer video and text chat for two participants.</div>
                     </div>
                     <div class="p-4 rounded-md w-1/2 pb-4 text-center border border-slate-400">
                         <button
@@ -36,7 +36,7 @@ export default function InviteButtons() {
                         >
                             Advanced
                         </button>
-                        <div class="text-sm">
+                        <div class="text-[11px] tablet:text-sm">
                             Peer-to-peer video and text chat with collaboration tools: shared tasks, screens, whiteboard, files
                             and folders.
                         </div>
@@ -50,7 +50,7 @@ export default function InviteButtons() {
                         >
                             Extra Secure
                         </button>
-                        <div class="text-sm">
+                        <div class="text-[11px] tablet:text-sm">
                             Peer-to-peer voice and text chat for two participants, secured with asymmetric encryption, providing a
                             security level comparable to Ethereum blockchain technology.
                         </div>
@@ -59,10 +59,10 @@ export default function InviteButtons() {
                         <button class="bg-blue-600 hover:bg-blue-800 text-white w-full rounded py-1 text-lg mb-2 cursor-pointer">
                             Join
                         </button>
-                        <div class="text-sm">Join a friend's ExtraSafe chat session via an invitation link.</div>
+                        <div class="text-[11px] tablet:text-sm">Join a friend's ExtraSafe chat session via an invitation link.</div>
                     </div>
                 </div>
-                <div class="text-center mt-8 text-sm">
+                <div class="text-center mt-8 text-[11px] tablet:text-sm">
                     <div>
                         <b>ExtraSafe</b> is designed to be the best choice for private and secure communication. By utilizing
                         peer-to-peer connections and advanced asymmetric encryption, your conversations remain private and

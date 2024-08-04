@@ -11,8 +11,12 @@ export default function Status({ isConnected }) {
     }, [state.peer])
 
     return <div class="p-4 border-t border-gray-400 flex justify-center gap-4">
-        <div class="text-center">{isConnected ? "Connected" : "Not connected"}</div>
-        {state.account && <div>{state.account.name}</div>}
-        <div>{state.peer?.id}</div>
+        <div class="text-sm">
+            <div class="text-center pb-1">{isConnected ? "Connected" : "Not connected"}</div>
+            <div class="flex justify-center gap-2">
+                {state.account && <div class="bold">{state.account.name}</div>}
+                <div class="truncate">{state.peer?.id}</div>
+            </div>
+        </div>
     </div>
 }

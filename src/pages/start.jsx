@@ -25,8 +25,8 @@ const Start = () => {
 
     return (
         <div class="h-full w-full">
-            <div class="flex justify-between gap-8 w-full h-full px-8 py-4">
-                <div class="h-full w-1/2">
+            <div class="landscape:flex landscape:justify-between gap-8 w-full h-full px-8 py-4 portrait:flex portrait:flex-col">
+                <div class="landscape:h-full landscape:w-1/2 portrait:max-h-1/2 portrait:grow portrait:w-full">
                     <div class={`${state.mode ? "h-1/2" : "h-full"} w-full flex justify-center items-center gap-2`}>
                         <Video stream={state.localStream} name="my video" />
                         {state.remoteStream && <Video stream={state.remoteStream} name="remote video" />}
@@ -39,7 +39,7 @@ const Start = () => {
                         </button>
                     </div>}
                 </div>
-                <div class="h-full w-1/2 border border-gray-400 rounded-md">
+                <div class="landscape:h-full landscape:w-1/2 portrait:max-h-1/2 portrait:w-full portrait:h-fit">
                     {state.mode ? <div class="p-4">{state.mode}</div> : <InviteButtons />}
                 </div>
             </div>
