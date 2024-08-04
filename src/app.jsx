@@ -31,6 +31,7 @@ export function App() {
         dispatch({ type: "SET_ACCOUNTS", payload: acc })
     }, [])
 
+    /* temp - not to be removed */
   /*   const startScreenShare = async () => {
         try {
             const screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true })
@@ -93,12 +94,7 @@ export function App() {
                 <History path="/history" />
                 <Account path="/account" />
                 <Settings path="/settings" />
-            </Router>
-            {/* {!state.template && <Templates />}
-            {state.template === 'braude' && <Braude />}
-            {state.tab === "Screen" && <Video stream={state.tempStream} />}
-            {state.tab === "Whiteboard" && <Whiteboard />}
-            {state.tab === "Documents" && <Documents />}        */}    
+            </Router>            
         </Layout>
     )
 }
