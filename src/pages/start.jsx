@@ -27,7 +27,7 @@ const Start = () => {
         <div class="h-full w-full">
             <div class="landscape:flex landscape:justify-between gap-8 w-full h-full px-4 low:px-8 low:py-4 portrait:flex portrait:flex-col">
                 <div class="landscape:h-full landscape:w-1/2 portrait:max-h-1/2 portrait:grow portrait:w-full">
-                    <div class={`w-full flex justify-center items-center gap-2`}> {/* ${state.mode ? "h-1/2" : "h-full"} */}
+                    <div class={`w-full h-full flex justify-center items-center gap-2`}> {/* ${state.mode ? "h-1/2" : "h-full"} */}
                         <Video stream={state.localStream} name="my video" />
                         {state.remoteStream && <Video stream={state.remoteStream} name="remote video" />}
                     </div>

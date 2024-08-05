@@ -30,6 +30,7 @@ module.exports = {
                 'desktop': '1296px',
                 'landscape': { 'raw': '(orientation: landscape)' },
                 'portrait': { 'raw': '(orientation: portrait)' },
+                'h700':{ 'raw': '(min-height: 700px)' }, // low screen height
                 'low': { 'raw': '(min-height: 500px)' }, // low screen height
                 'tablet-h': { 'raw': '(min-height: 730px)' }, // tablet height
                 'tablet-wh': { 'raw': '(min-width: 1000px) and (min-height: 730px)' } // tablet width and height
