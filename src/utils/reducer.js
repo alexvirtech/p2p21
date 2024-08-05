@@ -1,3 +1,4 @@
+import { mode } from "crypto-js"
 import { defAccount } from "./common"
 import { encrypt, decrypt } from "./crypto"
 //import { invType } from "./common"
@@ -80,7 +81,7 @@ export const reducer = (state, action) => {
         case "SET_TEMP_STREAM":
             return { ...state, tempStream: action.payload }
         case "SET_RECIPIENT":
-            return { ...state, recipient: action.payload }
+            return { ...state, recipient: action.payload.id, mode: action.payload.tp }
         default:
             return state
     }
