@@ -2,25 +2,11 @@ import { useState, useEffect, useContext } from "preact/hooks"
 import { Context } from "../utils/context"
 import { usePeer } from "../hooks/usePeer"
 import Video from "../components/video"
-import useQueryParams from "../hooks/useQueryParams"
 import InviteButtons from "../components/inviteButtons"
 
 const Start = () => {
     const { state, dispatch } = useContext(Context)
-    const { peer, message, connect, disconnect, handleDisconnect } = usePeer(dispatch, state)
-    const { id, tp } = useQueryParams()
-
-    useEffect(() => {
-        if (id && tp) {
-            dispatch({ type: "SET_RECIPIENT", payload: {id,tp} })            
-        }
-    }, [])
-
-    useEffect(() => {
-        if (state.recipient && peer) {
-            connect(state.recipient)
-        }
-    }, [state.recipient, peer])
+    const { peer, message, connect, disconnect, handleDisconnect } = usePeer(dispatch, state)   
 
     return (
         <div class="h-full w-full">

@@ -3,6 +3,7 @@ import { Peer } from "peerjs"
 import { peerConfig } from "../utils/config"
 import { useStream } from "./useStream"
 import { invType } from "../utils/common"
+import useQueryParams from "../hooks/useQueryParams" // Import useQueryParams
 
 export const usePeer = (dispatch, state) => {
     const [peer, setPeer] = useState(null)
@@ -12,6 +13,21 @@ export const usePeer = (dispatch, state) => {
     const { localStream } = useStream("video")
 
     const accounts = ["Default", "Default 1", "Default 2", "Default 3", "Default 4"]
+
+    // Query Params
+    const { id, tp } = useQueryParams()
+
+    useEffect(() => {
+        if (id && tp) {
+            dispatch({ type: "SET_RECIPIENT", payload: { id, tp } })            
+        }
+    }, [id, tp])
+
+    useEffect(() => {
+        if (state.recipient && peer) {
+            connect(state.recipient)
+        }
+    }, [state.recipient, peer])
 
     useEffect(() => {
         if (peer) {
@@ -35,25 +51,6 @@ export const usePeer = (dispatch, state) => {
     const initPeer = async (id) => {
         try {
             const pr = new Peer(id, peerConfig)
-
-            // Add the custom disconnectRecipient function
-           /*  pr.disconnectRecipient = () => {
-                if (conn) {
-                    if (conn.open) {
-                        console.log("Sending disconnect message to recipient...")
-                        conn.send({ type: "disconnect" })  // Notify the recipient to disconnect
-                    } else {
-                        console.log("Connection is not open, retrying...")
-                        conn.on("open", () => {
-                            console.log("Connection opened, now sending disconnect message to recipient...")
-                            conn.send({ type: "disconnect" })  // Notify the recipient to disconnect
-                        })
-                    }
-                } else {
-                    console.log("Connection is not available to send disconnect message")
-                }
-                handleDisconnect()
-            } */
 
             pr.on("open", (id) => {
                 setPeer(pr)

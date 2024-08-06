@@ -20,10 +20,16 @@ export const InitState = {
     call: null,
     messages: [],
     template: null,
+    // temp for layout creation
+    connections: 3,
+    isConnected: false,
+    isChat: true,
+    isVideo: true,
 }
 
 export const reducer = (state, action) => {
     switch (action.type) {
+        /* account */
         case "SET_ACCOUNTS":
             const selected = action.payload.find((a) => a.name === defAccount) //temp
             return { ...state, accounts: action.payload, account: selected }
@@ -55,13 +61,14 @@ export const reducer = (state, action) => {
                     : a
             })
             return { ...state, accounts: updatedAcc3, account: { ...state.account, name: action.payload } }
+        /* page */
         case "SET_PAGE":
             return { ...state, page: action.payload }
         case "SET_MODAL":
             return { ...state, modal: action.payload }
         case "SET_MODE":
             return { ...state, mode: action.payload }
-        case "SET_TEMPLATE":
+        case "SET_TEMPLATE": // TBR
             return { ...state, template: action.payload }
         case "SET_PEER":
             if (action.payload.remoteStream && state.remoteStream && state.remoteStream.id !== action.payload.remoteStream.id) {
@@ -82,6 +89,13 @@ export const reducer = (state, action) => {
             return { ...state, tempStream: action.payload }
         case "SET_RECIPIENT":
             return { ...state, recipient: action.payload.id, mode: action.payload.tp }
+        /* temp */
+        case "CONNECT":
+            return { ...state, isConnected: action.payload }        
+        case "SHOW_CHAT":
+            return { ...state, isChat: action.payload }       
+            case "SHOW_VIDEO":
+                return { ...state, isVideo: action.payload }      
         default:
             return state
     }

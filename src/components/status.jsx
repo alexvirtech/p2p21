@@ -1,5 +1,6 @@
 import { useContext, useEffect } from "preact/hooks"
 import { Context } from "../utils/context"
+import { DisconnectIcon, ConnectIcon, ChatIcon, ChatCloseIcon, VideoIcon, VideoCloseIcon } from "../utils/icons"
 
 export default function Status({ isConnected }) {
     const { state, dispatch } = useContext(Context)
@@ -10,13 +11,60 @@ export default function Status({ isConnected }) {
         }
     }, [state.peer])
 
-    return <div class="p-1 border-t border-gray-400 text-sm h-[62px] flex flex-col itmes-center">
-        <div class="text-sm max-w-screen">
-            <div class="text-center pb-1">{isConnected ? "Connected" : "Not connected"}</div>
-            <div class="flex justify-center gap-2 w-full max-w-screen px-4">
-                {/* {state.account && <div class="bold">{state.account.name}</div>} */}
-                <div class="truncate w-full text-center">{state.peer?.id}</div>
-            </div>
+    return (
+        <div class="p-3 border-t border-gray-400 text-sm h-[62px] flex itmes-center justify-center gap-2">           
+            {state.isConnected ? (
+                <>
+                    {state.isVideo ? (
+                        <div
+                            class="cursor-pointer rounded bg-blue-500 hover:bg-blue-700 text-white p-2 aspect-w-1 aspect-h-1"
+                            onClick={() => dispatch({ type: "SHOW_VIDEO", payload: false })}
+                            title="temp button"
+                        >
+                            <VideoCloseIcon />
+                        </div>
+                    ) : (
+                        <div
+                            class="cursor-pointer rounded bg-blue-500 hover:bg-blue-700 text-white p-2 aspect-w-1 aspect-h-1"
+                            onClick={() => dispatch({ type: "SHOW_VIDEO", payload: true })}
+                            title="temp button"
+                        >
+                            <VideoIcon />
+                        </div>
+                    )}
+                    {state.isChat ? (
+                        <div
+                            class="cursor-pointer rounded bg-blue-500 hover:bg-blue-700 text-white p-2 aspect-w-1 aspect-h-1"
+                            onClick={() => dispatch({ type: "SHOW_CHAT", payload: false })}
+                            title="temp button"
+                        >
+                            <ChatCloseIcon />
+                        </div>
+                    ) : (
+                        <div
+                            class="cursor-pointer rounded bg-blue-500 hover:bg-blue-700 text-white p-2 aspect-w-1 aspect-h-1"
+                            onClick={() => dispatch({ type: "SHOW_CHAT", payload: true })}
+                            title="temp button"
+                        >
+                            <ChatIcon />
+                        </div>
+                    )}
+                    <div
+                        class="cursor-pointer rounded bg-red-600 hover:bg-red-800 text-white p-2 aspect-w-1 aspect-h-1"
+                        onClick={() => dispatch({ type: "CONNECT", payload: false })}
+                    >
+                        <DisconnectIcon />
+                    </div>
+                </>
+            ) : (
+                <div
+                    class="cursor-pointer rounded bg-blue-500 hover:bg-blue-700 text-white p-2"
+                    onClick={() => dispatch({ type: "CONNECT", payload: true })}
+                    title="temp button"
+                >
+                    <ConnectIcon />
+                </div>
+            )}
         </div>
-    </div>
+    )
 }
