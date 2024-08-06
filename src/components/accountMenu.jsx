@@ -26,7 +26,7 @@ const AccountMenu = ({ close }) => {
 
     const changeAccount = (e) => {
         handleAccountChange(e)
-        close()
+        //close()
     }
 
     return (
