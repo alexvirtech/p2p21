@@ -23,3 +23,10 @@ export const actions = [
     { label: "Restore Account", action: "restore",custom:true,border:true },    
     { label: "Delete Account", action: "delete",custom:false, special: true }
 ]
+
+export const connectActions = [
+    { label: "Basic mode", action: "basic" },
+    { label: "Advanced mode", action: "advanced" },
+    { label: "Secure mode", action: "secure" },
+    { label: "Join meeting", action: "join" }
+]

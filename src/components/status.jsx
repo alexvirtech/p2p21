@@ -1,9 +1,11 @@
-import { useContext, useEffect } from "preact/hooks"
+import { useContext, useEffect, useState } from "preact/hooks"
 import { Context } from "../utils/context"
 import { DisconnectIcon, ConnectIcon, ChatIcon, ChatCloseIcon, VideoIcon, VideoCloseIcon } from "../utils/icons"
+import ConnectMenu from "./connectMenu"
 
 export default function Status({ isConnected }) {
     const { state, dispatch } = useContext(Context)
+    const [showConnectMenu, setShowConnectMenu] = useState(false)
 
     useEffect(() => {
         if (state.peer) {
@@ -12,7 +14,7 @@ export default function Status({ isConnected }) {
     }, [state.peer])
 
     return (
-        <div class="p-3 border-t border-gray-400 text-sm h-[62px] flex itmes-center justify-center gap-2">           
+        <div class="p-3 border-t border-gray-400 text-sm h-[62px] flex items-center justify-center gap-2">
             {state.isConnected ? (
                 <>
                     {state.isVideo ? (
@@ -57,12 +59,15 @@ export default function Status({ isConnected }) {
                     </div>
                 </>
             ) : (
-                <div
-                    class="cursor-pointer rounded bg-blue-500 hover:bg-blue-700 text-white p-2"
-                    onClick={() => dispatch({ type: "CONNECT", payload: true })}
-                    title="temp button"
-                >
-                    <ConnectIcon />
+                <div class="relative">
+                    <div
+                        class="cursor-pointer rounded bg-blue-500 hover:bg-blue-700 text-white p-2 z-10"
+                        onClick={() => setShowConnectMenu(!showConnectMenu)}
+                        title="temp button"
+                    >
+                        <ConnectIcon />
+                    </div>
+                    {showConnectMenu && <ConnectMenu close={() => setShowConnectMenu(false)} />}
                 </div>
             )}
         </div>
