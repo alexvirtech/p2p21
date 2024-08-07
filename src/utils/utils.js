@@ -27,3 +27,8 @@ export const downloadJSON = (jsonObject, filename = "data.json") => {
 /* // Example usage:
 const data = { name: "John Doe", age: 30, city: "New York" };
 downloadJSON(data, 'example.json'); */
+
+export const capitalize = (str) => {
+    if (typeof str !== "string" || str.length === 0) return ""
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
+}

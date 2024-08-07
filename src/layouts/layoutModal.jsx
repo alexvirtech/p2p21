@@ -1,6 +1,6 @@
 import { createPortal } from 'preact/compat'
 
-export default function LayoutModal({ children, title, close = ()=>{}, width = "w-[90%] max-w-[600px]", mt="mt-[5%]"}) { 
+export default function LayoutModal({ children, title, close = ()=>{}, width = "w-[99%] max-w-[700px]", mt="mt-[1%] h700:mt-[10%]" }) { 
     return createPortal( 
         <div class="fixed z-[1000] inset-0 overflow-y-auto flex items-start justify-center" onClick={(e)=>e.stopPropagation()}> 
             <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onClick={(e)=>
