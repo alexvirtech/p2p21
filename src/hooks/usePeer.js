@@ -69,11 +69,11 @@ export const usePeer = (dispatch, state) => {
                 dispatch({ type: "SET_PEER", payload: { call: incomingCall } })
                 let streamToSend = localStream
 
-                if (state.mode === invType.secure) {
+                if (state.mode === invType.Secure && localStream) {
                     const { encryptedStream } = await EncryptStream(
                         localStream,
                         state.account.wallet.privateKey,
-                        state.recipient.publicKey,
+                        incomingCall.metadata.pk,
                     )
                     streamToSend = encryptedStream
                 }
@@ -81,7 +81,7 @@ export const usePeer = (dispatch, state) => {
                 incomingCall.answer(streamToSend)
                 incomingCall.on("stream", async (remoteStream) => {
                     let streamToSet = remoteStream
-                    if (state.mode === invType.secure) {
+                    if (state.mode === invType.Secure) {
                         streamToSet = await DecryptStream(
                             remoteStream,
                             incomingCall.metadata.encryptedAesKey,
@@ -105,7 +105,7 @@ export const usePeer = (dispatch, state) => {
 
                 connection.on("data", async (data) => {
                     console.log("Received data:", data)
-                    if (state.mode === invType.secure && typeof data === "object" && data.encryptedText) {
+                    if (state.mode === invType.Secure && typeof data === "object" && data.encryptedText) {
                         const decryptedData = await DecryptText(
                             data.encryptedText,
                             data.encryptedAesKey,
@@ -145,13 +145,13 @@ export const usePeer = (dispatch, state) => {
             //conn.send({ type: "pk", payload: state.account.wallet.publicKey })
 
             let callToSet
-            if (state.mode === invType.secure) {
+            if (state.mode === invType.Secure) {
                 const { encryptedStream, encryptedAesKey, iv } = await EncryptStream(
                     localStream,
                     state.account.wallet.privateKey,
-                    conn.peer,
+                    state.recipient.publicKey,
                 )
-                callToSet = peer.call(conn.peer, encryptedStream, { metadata: { encryptedAesKey, iv } })
+                callToSet = peer.call(conn.peer, encryptedStream, { metadata: { encryptedAesKey, iv, pk: state.account.wallet.publicKey } })
             } else {
                 callToSet = peer.call(conn.peer, localStream)
             }
@@ -164,7 +164,7 @@ export const usePeer = (dispatch, state) => {
 
             callToSet.peerConnection.ontrack = async (event) => {
                 let streamToSet = event.streams[0]
-                if (state.mode === invType.secure) {
+                if (state.mode === invType.Secure) {
                     streamToSet = await DecryptStream(
                         streamToSet,
                         callToSet.metadata.encryptedAesKey,
@@ -179,7 +179,7 @@ export const usePeer = (dispatch, state) => {
 
         conn.on("data", async (data) => {
             console.log("Received data on connection:", data)
-            if (state.mode === invType.secure && typeof data === "object" && data.encryptedText) {
+            if (state.mode === invType.Secure && typeof data === "object" && data.encryptedText) {
                 const decryptedData = await DecryptText(
                     data.encryptedText,
                     data.encryptedAesKey,
@@ -209,7 +209,7 @@ export const usePeer = (dispatch, state) => {
         if (!call) return
         call.on("stream", async (remoteStream) => {
             let streamToSet = remoteStream
-            if (state.mode === invType.secure) {
+            if (state.mode === invType.Secure) {
                 streamToSet = await DecryptStream(
                     remoteStream,
                     call.metadata.encryptedAesKey,
@@ -231,7 +231,7 @@ export const usePeer = (dispatch, state) => {
 
     const connect = (recId) => {
         console.log("Attempting to connect to peer:", recId)
-        const connection = peer.connect(recId)
+        const connection = peer.connect(recId,{pk:state.account.wallet.publicKey})
         setConn(connection)
 
         connection.on("open", () => {
