@@ -70,11 +70,12 @@ export default function Status() {
             ) : (
                 <div class="relative">
                     <div
-                        class="cursor-pointer rounded bg-blue-500 hover:bg-blue-700 text-white p-2 z-10"
+                        class="cursor-pointer rounded bg-blue-500 hover:bg-blue-700 text-white py-1 px-3 z-10 flex justify-center items-center gap-2"
                         onClick={() => setShowConnectMenu(!showConnectMenu)}
                         title="temp button"
-                    >
+                    >                        
                         <ConnectIcon />
+                        <div class="text-lg">Start Call</div>
                     </div>
                     {showConnectMenu && <ConnectMenu close={() => setShowConnectMenu(false)} />}
                     {state.modal === "invitation" && <Invitation close={() => dispatch({ type: "SET_MODAL", payload: null })} />}
