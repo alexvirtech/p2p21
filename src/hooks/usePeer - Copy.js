@@ -4,7 +4,6 @@ import { peerConfig } from "../utils/config"
 import { useStream } from "./useStream"
 import { invType } from "../utils/common"
 import useQueryParams from "../hooks/useQueryParams" // Import useQueryParams
-import { EncryptText, DecryptText, EncryptStream, DecryptStream } from "../utils/encdec" // Import encryption utilities
 
 export const usePeer = (dispatch, state) => {
     const [peer, setPeer] = useState(null)
@@ -20,7 +19,7 @@ export const usePeer = (dispatch, state) => {
 
     useEffect(() => {
         if (id && tp) {
-            dispatch({ type: "SET_RECIPIENT", payload: { id, tp } })
+            dispatch({ type: "SET_RECIPIENT", payload: { id, tp } })            
         }
     }, [id, tp])
 
@@ -59,29 +58,13 @@ export const usePeer = (dispatch, state) => {
                 console.log("Peer ID:", id)
             })
 
-            pr.on("call", async (incomingCall) => {
+            pr.on("call", (incomingCall) => {
                 console.log("Incoming call")
                 dispatch({ type: "SET_PEER", payload: { call: incomingCall } })
-                let streamToSend = localStream
-
-                if (state.encryptedMode) {
-                    const { encryptedStream } = await EncryptStream(localStream,state.account.wallet.privateKey, state.recipient)
-                    streamToSend = encryptedStream
-                }
-
-                incomingCall.answer(streamToSend)
-                incomingCall.on("stream", async (remoteStream) => {
-                    let streamToSet = remoteStream
-                    if (state.encryptedMode) {
-                        streamToSet = await DecryptStream(
-                            remoteStream,
-                            incomingCall.metadata.encryptedAesKey,
-                            incomingCall.metadata.iv,
-                            state.account.wallet.privateKey,
-                        )
-                    }
-                    setRemoteStream(streamToSet)
-                    dispatch({ type: "SET_PEER", payload: { remoteStream: streamToSet } })
+                incomingCall.answer(localStream)
+                incomingCall.on("stream", (remoteStream) => {
+                    setRemoteStream(remoteStream)
+                    dispatch({ type: "SET_PEER", payload: { remoteStream } })
                 })
             })
 
@@ -89,23 +72,20 @@ export const usePeer = (dispatch, state) => {
                 setConn(connection)
                 console.log("Connection established with peer:", connection.peer)
 
+                // Check if the connection is immediately open
+                if (connection.open) {
+                    console.log("Connection is already open with peer:", connection.peer)
+                } else {
+                    console.log("Waiting for connection to open with peer:", connection.peer)
+                }
+
                 connection.on("open", () => {
                     console.log("Connection is now open with peer:", connection.peer)
                 })
 
-                connection.on("data", async (data) => {
+                connection.on("data", (data) => {
                     console.log("Received data:", data)
-                    if (state.encryptedMode && typeof data === "object" && data.encryptedText) {
-                        const decryptedData = await DecryptText(
-                            data.encryptedText,
-                            data.encryptedAesKey,
-                            data.iv,
-                            state.account.privateKey,
-                        )
-                        handleData(JSON.parse(decryptedData))
-                    } else {
-                        handleData(data)
-                    }
+                    handleData(data)
                 })
             })
 
@@ -121,6 +101,7 @@ export const usePeer = (dispatch, state) => {
                     console.log("Peer error:", err)
                 }
             })
+
         } catch (error) {
             console.error("Error creating peer:", error)
         }
@@ -139,51 +120,25 @@ export const usePeer = (dispatch, state) => {
 
     useEffect(() => {
         if (!conn) return
-        conn.on("open", async () => {
+        conn.on("open", () => {
             console.log("Connection opened with peer:", conn.peer)
             dispatch({ type: "SET_PEER", payload: { conn } })
-
-            let callToSet
-            if (state.encryptedMode) {
-                const { encryptedStream, encryptedAesKey, iv } = await EncryptStream(localStream,state.account.wallet.privateKey, conn.peer)
-                callToSet = peer.call(conn.peer, encryptedStream, { metadata: { encryptedAesKey, iv } })
-            } else {
-                callToSet = peer.call(conn.peer, localStream)
-            }
-
-            setCall(callToSet)
-            dispatch({ type: "SET_PEER", payload: { call: callToSet } })
+            const cn = peer.call(conn.peer, localStream)
+            setCall(cn)
+            dispatch({ type: "SET_PEER", payload: { call: cn } })
 
             dispatch({ type: "SET_MODE", payload: invType.Basic })
 
-            callToSet.peerConnection.ontrack = async (event) => {
-                let streamToSet = event.streams[0]
-                if (state.encryptedMode) {
-                    streamToSet = await DecryptStream(
-                        streamToSet,
-                        callToSet.metadata.encryptedAesKey,
-                        callToSet.metadata.iv,
-                        state.account.wallet.privateKey,
-                    )
-                }
-                setRemoteStream(streamToSet)
-                dispatch({ type: "SET_PEER", payload: { remoteStream: streamToSet } })
+            cn.peerConnection.ontrack = (event) => {
+                const [stream] = event.streams
+                setRemoteStream(stream)
+                dispatch({ type: "SET_PEER", payload: { remoteStream: stream } })
             }
         })
 
-        conn.on("data", async (data) => {
+        conn.on("data", (data) => {
             console.log("Received data on connection:", data)
-            if (state.encryptedMode && typeof data === "object" && data.encryptedText) {
-                const decryptedData = await DecryptText(
-                    data.encryptedText,
-                    data.encryptedAesKey,
-                    data.iv,
-                    state.account.privateKey,
-                )
-                handleData(JSON.parse(decryptedData))
-            } else {
-                handleData(data)
-            }
+            handleData(data)
         })
 
         conn.on("close", () => {
@@ -198,18 +153,9 @@ export const usePeer = (dispatch, state) => {
 
     useEffect(() => {
         if (!call) return
-        call.on("stream", async (remoteStream) => {
-            let streamToSet = remoteStream
-            if (state.encryptedMode) {
-                streamToSet = await DecryptStream(
-                    remoteStream,
-                    call.metadata.encryptedAesKey,
-                    call.metadata.iv,
-                    state.account.wallet.privateKey,
-                )
-            }
-            setRemoteStream(streamToSet)
-            dispatch({ type: "SET_PEER", payload: { remoteStream: streamToSet } })
+        call.on("stream", (remoteStream) => {
+            setRemoteStream(remoteStream)
+            dispatch({ type: "SET_PEER", payload: { remoteStream } })
         })
         call.on("close", () => {
             console.log("Call closed")
@@ -261,7 +207,7 @@ export const usePeer = (dispatch, state) => {
         console.log("Handling data:", data)
         if (data.type === "disconnect") {
             console.log("Disconnect message received")
-            handleDisconnect() // Handle the disconnect notification
+            handleDisconnect()  // Handle the disconnect notification
         } else if (data.type === "stopScreen") {
             stopSharedScreen()
         } else if (data.type === "set_tab") {
@@ -288,5 +234,5 @@ export const usePeer = (dispatch, state) => {
         }
     }, [peer])
 
-    return { peer, connect, disconnect: handleDisconnect, handleDisconnect } // Expose encryptedMode and setEncryptedMode
+    return { peer, connect, disconnect: handleDisconnect, handleDisconnect }
 }

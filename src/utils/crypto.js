@@ -1,5 +1,6 @@
 import CryptoJS from "crypto-js"
 
+// symmetric
 export const encrypt = (text, password) => {
     return CryptoJS.AES.encrypt(text, password).toString()
 }
@@ -11,3 +12,5 @@ export const decrypt = (text, password) => {
         return null
     }
 } 
+
+// asymmetric
