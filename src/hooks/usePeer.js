@@ -73,7 +73,8 @@ export const usePeer = (dispatch, state) => {
                     const { encryptedStream } = await EncryptStream(
                         localStream,
                         state.account.wallet.privateKey,
-                        incomingCall.metadata.pk,
+                        state.recipient.publicKey,
+                        //incomingCall.metadata.pk,
                     )
                     streamToSend = encryptedStream
                 }
@@ -97,6 +98,8 @@ export const usePeer = (dispatch, state) => {
             pr.on("connection", (connection) => {
                 setConn(connection)
                 console.log("Connection established with peer:", connection.peer)
+
+                console.log("md",connection.metadata)
 
                 connection.on("open", () => {
                     console.log("Connection is now open with peer:", connection.peer)
@@ -138,11 +141,13 @@ export const usePeer = (dispatch, state) => {
     useEffect(() => {
         if (!conn || connInitializedRef.current) return // Check if connection is already initialized
 
-        conn.on("open", async () => {
+        conn.on("open", async (a) => {
             connInitializedRef.current = true // Mark connection as initialized
             console.log("Connection opened with peer:", conn.peer)
             dispatch({ type: "SET_PEER", payload: { conn } })
             //conn.send({ type: "pk", payload: state.account.wallet.publicKey })
+            console.log('con',conn)
+            console.log('a',a)
 
             let callToSet
             if (state.mode === invType.Secure) {
