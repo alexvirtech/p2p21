@@ -9,24 +9,24 @@ export const invType = {
     Basic: "Basic",
     Advanced: "Advanced",
     Secure: "Secure",
-    Join: "Join"    
+    Join: "Join"
 }
 
 export const invButtonItems = [
     {
-        title: "Basic",
+        title: invType.Basic,
         description: "Peer-to-peer video and text chat for two participants.",
     },
     {
-        title: "Advanced",
+        title: invType.Advanced,
         description: "Peer-to-peer video and text chat with collaboration tools: shared tasks, screens, whiteboard, files and folders.",
     },
     {
-        title: "Secure",
+        title: invType.Secure,
         description: "Peer-to-peer voice and text chat, using asymmetric encryption and providing a blockchain security level.",
     },
     {
-        title: "Join",
+        title: invType.Join,
         description: "Join a friend's ExtraSafe chat session via an invitation link."
     }
 ]

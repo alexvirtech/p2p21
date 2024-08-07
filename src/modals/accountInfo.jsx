@@ -22,6 +22,16 @@ export default function AccountInfo({ close }) {
                     />
                </WithCopy>
             </div>
+            <div class="pt-3">Current Peer ID</div>
+            <div>
+               <WithCopy>
+                    <input
+                        class="w-full border border-slate-400 rounded py-1.5 px-4 text-sm"                        
+                        disabled
+                        value={state.address}
+                    />
+               </WithCopy>
+            </div>
             <div class="pt-3">Public Key</div>
             <div>
                 <WithCopy>

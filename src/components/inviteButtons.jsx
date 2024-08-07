@@ -6,14 +6,14 @@ import InvButton from "./invButton"
 
 export default function InviteButtons() {
     const { state, dispatch } = useContext(Context)
-    const [type, setType] = useState(invType.Basic)
+    //const [type, setType] = useState(invType.Basic)
     
     const invite = (type) => {        
-        setType(type)
-        if(type === invType.Join){
+        //setType(type)
+        if(type === invType.Join){ // Join
             // 
-        }else{
-            dispatch({ type: "SET_MODAL", payload: "invitation" })
+        }else{ // Secure, Basic, Advanced
+            dispatch({ type: "SET_MODAL", payload: "invitation", mode:type })
         }
         
     }
@@ -27,13 +27,13 @@ export default function InviteButtons() {
             <div class="w-full landscape:max-w-[600px]">
                 <div class="flex justify-center gap-0">
                 {
-                        [...invButtonItems].slice(0,2).map((item, i) => <InvButton key={i} invite={invite} title={item.title} description={item.description} />)
+                        [...invButtonItems].slice(0,2).map((item, i) => <InvButton key={i} invite={()=>invite(item.title)} title={item.title} description={item.description} />)
 
                     }                    
                 </div>
                 <div class="flex justify-center gap-0 mt-0">
                     {
-                        [...invButtonItems].slice(2,4).map((item, i) => <InvButton key={i} invite={invite} title={item.title} description={item.description} />)
+                        [...invButtonItems].slice(2,4).map((item, i) => <InvButton key={i} invite={()=>invite(item.title)} title={item.title} description={item.description} />)
 
                     }                       
                 </div>
@@ -47,7 +47,7 @@ export default function InviteButtons() {
                     <div class="mt-4 text-[13px]">Choose the option that meets your needs and connect with confidence.</div>
                 </div> */}
             </div>
-            {state.modal === 'invitation' && <Invitation type={type} close={closeModal}/>}
+            {state.modal === 'invitation' && <Invitation close={closeModal}/>}
         </div>
     )
 }

@@ -6,22 +6,23 @@ import WithCopy from "../components/withCopy"
 import { ShareIcon } from "../utils/icons"
 import Router, { route } from 'preact-router'
 
-export default function Invitation({ close, type }) {
+export default function Invitation({ close }) {
     const { state, dispatch } = useContext(Context)
     const [error, setError] = useState("")
     //const [invUrl, setInvUrl] = useState("")
 
     useEffect(() => {
         //
+        console.log("Invitation type:", state.mode)        
     }, [])
 
     const handleShare = () => {}
 
     return (
-        <LayoutModal title="Share Invitation Link" close={close}>
+        <LayoutModal title="Share Invitation Link" close={()=>close()}>
             <div class="flex justify-between gap-2 pb-1 pt-2">
                 <div>Invitation link</div>
-                <b title="basic mode">{type}</b>
+                <b title="basic mode">{state.mode}</b>
             </div>            
             <div class="flex justify-start gap-2">
                 <WithCopy>
@@ -29,7 +30,7 @@ export default function Invitation({ close, type }) {
                         class="w-full border border-slate-400 rounded py-1.5 px-4"
                         rows={4}
                         disabled
-                        value={`${window.location.origin}/?id=${state.account.wallet.publicKey}&tp=${type}` }
+                        value={`${window.location.origin}/?id=${state.address}&tp=${state.mode}&pk=${state.account.wallet.publicKey}` }
                     />
                 </WithCopy>
             </div>

@@ -1,14 +1,15 @@
 import { mode } from "crypto-js"
-import { defAccount } from "./common"
+import { defAccount, invType } from "./common"
 import { encrypt, decrypt } from "./crypto"
-//import { invType } from "./common"
 
 export const InitState = {
     accounts: [],
-    account: null, //defAccount,
+    account: null, // {name: [account name], wallet: {publicKey: [public key], privateKey: [private key], mnemonic: [mnemonic phrase]}}
+    address: null, // my peer id
+    recipient: null, // {address: [remote address], publicKey: [remote public key]}
     tempAcc: null,
     modal: null,
-    mode: null, //
+    mode: null, //basic,advanced,secure
     page: "Start",
     tabs: ["Dashboard", "Screen", "Whiteboard", "Documents"],
     tab: "Dashboard",
@@ -25,12 +26,14 @@ export const InitState = {
     isConnected: false,
     isChat: true,
     isVideo: true,
-    encryptedMode: true,
+    disconnectExt: false,
 }
 
 export const reducer = (state, action) => {
     switch (action.type) {
         /* account */
+        case "SET_ADDRESS":
+            return { ...state, address: action.payload }
         case "SET_ACCOUNTS":
             const selected = action.payload.find((a) => a.name === defAccount) //temp
             return { ...state, accounts: action.payload, account: selected }
@@ -66,7 +69,7 @@ export const reducer = (state, action) => {
         case "SET_PAGE":
             return { ...state, page: action.payload }
         case "SET_MODAL":
-            return { ...state, modal: action.payload }
+            return { ...state, modal: action.payload, ...(action.mode && { mode: action.mode }) }
         case "SET_MODE":
             return { ...state, mode: action.payload }
         case "SET_TEMPLATE": // TBR
@@ -89,14 +92,18 @@ export const reducer = (state, action) => {
         case "SET_TEMP_STREAM":
             return { ...state, tempStream: action.payload }
         case "SET_RECIPIENT":
-            return { ...state, recipient: action.payload.id, mode: action.payload.tp }
+            return { ...state, recipient: action.payload.recipient, mode: action.payload.tp }
+        case "SET_RECIPIENT_PK":
+            return { ...state, recipient: { ...state.recipient, publicKey: action.payload } }
+        case "DISCONNECT_EXT":            
+            return { ...state, disconnectExt: action.payload }
         /* temp */
         case "CONNECT":
-            return { ...state, isConnected: action.payload }        
+            return { ...state, isConnected: action.payload }
         case "SHOW_CHAT":
-            return { ...state, isChat: action.payload }       
-            case "SHOW_VIDEO":
-                return { ...state, isVideo: action.payload }      
+            return { ...state, isChat: action.payload }
+        case "SHOW_VIDEO":
+            return { ...state, isVideo: action.payload }
         default:
             return state
     }

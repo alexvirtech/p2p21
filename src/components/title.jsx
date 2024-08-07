@@ -21,7 +21,7 @@ const Title = () => {
                 <MainMenuIcon />
             </div>
             <h1 class="text-xl xxxs:text-3xl flex justify-center py-2 text-slate-600 font-bold gap-2">ExtraSafe <div class="hidden mobile:inline">Communicator</div></h1>
-            <div class="py-2 px-6 cursor-pointer" onClick={()=>setShowAcc(true)}>
+            <div class="py-2 px-6 cursor-pointer" onClick={()=>setShowAcc(true)} title={state.account?.name}>
                 <AccountIcon />
             </div>
             {showMainMenu && <MainMenu close={() => setShowMain(false)} />}

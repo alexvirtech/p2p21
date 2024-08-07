@@ -16,16 +16,16 @@ const Start = () => {
                         <Video stream={state.localStream} name="my video" />
                         {state.remoteStream && <Video stream={state.remoteStream} name="remote video" />}
                     </div>
-                    {state.mode && <div class="py-4 text-center">
+                    {/* {state.isConnected && <div class="py-4 text-center">
                         <button
                             class="py-1 px-4 text-sm bg-blue-500 hover:bg-blue-600 text-white rounded"
                             onClick={handleDisconnect}>
                             Disconnect
                         </button>
-                    </div>}
+                    </div>} */}
                 </div>
                 <div class="landscape:w-1/2 portrait:w-full portrait:h-fit">
-                    {state.mode ? <div class="p-4">{state.mode}</div> : <InviteButtons />}
+                    {state.isConnected ? <div class="p-4">{state.mode}</div> : <InviteButtons />}
                 </div>
             </div>
         </div>

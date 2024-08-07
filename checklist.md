@@ -1,8 +1,16 @@
+*** 07/08 ***
+- invitation modal
+    - description
+    - join
+- text chat
+- advanced
+- refactory
+
 *** 31/07 ***
 //- main menu
 //- account menu
 - common layout inc menus
-    - responsivity
+    //- responsivity
     - dark/light theme
 - start page
     - basic video messanger

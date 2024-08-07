@@ -1,8 +1,5 @@
 import { ethers } from "ethers"
 
-// Debugging: Ensure randomBytes is correctly referenced
-console.log("Ethers randomBytes method:", ethers.randomBytes)
-
 export async function EncryptText(text, publicKey) {
     try {
         const compressedPublicKey = ethers.utils.computePublicKey(publicKey, true)
