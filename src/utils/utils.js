@@ -32,3 +32,35 @@ export const capitalize = (str) => {
     if (typeof str !== "string" || str.length === 0) return ""
     return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
 }
+
+export const shareText = async (textToShare) => {
+    if (!navigator.share) {
+        console.error("Web Share API is not supported in your browser")
+        return
+    }
+    try {
+        await navigator.share({
+            text: textToShare,
+        })
+        console.log("Address shared successfully")
+    } catch (err) {
+        console.error("Failed to share address: ", err)
+    }
+}
+
+export const shareLink = async (title, url) => {
+    if (navigator.share) {
+        try {
+            await navigator.share({
+                title: title,
+                text: `${title} - ${url}`,
+                url: url,
+            })
+            console.log("Link shared successfully")
+        } catch (error) {
+            console.error("Error sharing link:", error)
+        }
+    } else {
+        console.warn("Web Share API is not supported in this browser")
+    }
+}

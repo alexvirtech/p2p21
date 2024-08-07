@@ -5,7 +5,7 @@ import { renameAccount } from "../utils/localDB"
 import WithCopy from "../components/withCopy"
 import { ShareIcon } from "../utils/icons"
 import Router, { route } from "preact-router"
-import { capitalize } from "../utils/utils"
+import { capitalize,shareLink } from "../utils/utils"
 import {invType} from "../utils/common"
 import InvButtonItems from "../components/invButtonItems"
 
@@ -13,15 +13,13 @@ export default function Invitation({ close }) {
     const { state, dispatch } = useContext(Context)
     const [error, setError] = useState("")
     const [item, setItem] = useState()
+    const [link, setLink] = useState("")
 
     useEffect(() => {
-        //
-        console.log("Invitation type:", state.mode)
-        //const i =  invButtonItems.find(item => item.title === state.mode)
-        //setItem(i)
-    }, [state.modal])
-
-    const handleShare = () => {}
+        console.log("Invitation type:", state.mode)       
+        const l = `${window.location.origin}/?id=${state.address}&tp=${state.mode}&pk=${state.account.wallet.publicKey}`
+        setLink(l)
+    }, [state.modal])    
 
     return (
         <LayoutModal title="Invitation Link" close={() => close()}>
@@ -35,7 +33,7 @@ export default function Invitation({ close }) {
                         class="w-full border border-slate-400 rounded py-1.5 px-4"
                         rows={3}
                         disabled
-                        value={`${window.location.origin}/?id=${state.address}&tp=${state.mode}&pk=${state.account.wallet.publicKey}`}
+                        value={link}
                     />
                 </WithCopy>
             </div>
@@ -44,7 +42,7 @@ export default function Invitation({ close }) {
                 <button
                     type="button"
                     class="h-auto bg-blue-500 hover:bg-blue-700 text-white font-bold flex justify-center py-2 px-8 rounded my-4"
-                    onClick={handleShare}
+                    onClick={()=>shareLink(link,link)}
                 >
                     Share
                 </button>
