@@ -35,7 +35,7 @@ export const usePeer = (dispatch, state) => {
         if (peerInitializedRef.current) return
 
         if (state.account) {
-            console.log(`Initializing peer for account: ${state.account.name}`)
+            //console.log(`Initializing peer for account: ${state.account.name}`)
             initPeer()
             peerInitializedRef.current = true
         }
@@ -60,11 +60,11 @@ export const usePeer = (dispatch, state) => {
                 setPeer(pr)
                 dispatch({ type: "SET_PEER", payload: { peer: pr } })
                 dispatch({ type: "SET_ADDRESS", payload: id })
-                console.log("Peer ID:", id)
+                //console.log("Peer ID:", id)
             })
 
             pr.on("call", async (incomingCall) => {
-                console.log("Incoming call")
+                //console.log("Incoming call")
                 dispatch({ type: "SET_PEER", payload: { call: incomingCall } })
                 let streamToSend = localStream
 
@@ -73,7 +73,6 @@ export const usePeer = (dispatch, state) => {
                         localStream,
                         state.account.wallet.privateKey,
                         state.recipient.publicKey,
-                        //incomingCall.metadata.pk,
                     )
                     streamToSend = encryptedStream
                     //console.log("peer - on call")
@@ -82,6 +81,11 @@ export const usePeer = (dispatch, state) => {
 
                 incomingCall.answer(streamToSend)
                 incomingCall.on("stream", async (remoteStream) => {
+                    if(!incomingCall.metadata){
+                        console.log("Metadata not found in incoming call")
+                        handleDisconnect()
+                        return
+                    }
                     let streamToSet = remoteStream
                     if (state.mode === invType.Secure) {
                         streamToSet = await DecryptStream(
@@ -100,17 +104,15 @@ export const usePeer = (dispatch, state) => {
 
             pr.on("connection", (connection) => {
                 setConn(connection)
-                console.log("Connection established with peer:", connection.peer)
-
-                console.log("md", connection.metadata)
+                
                 dispatch({ type: "SET_RECIPIENT_PK", payload: connection.metadata })
 
                 connection.on("open", () => {
-                    console.log("Connection is now open with peer:", connection.peer)
+                    //console.log("Connection is now open with peer:", connection.peer)
                 })
 
                 connection.on("data", async (data) => {
-                    console.log("Received data:", data)
+                    //console.log("Received data:", data)
                     if (state.mode === invType.Secure && typeof data === "object" && data.encryptedText) {
                         const decryptedData = await DecryptText(
                             data.encryptedText,
@@ -128,13 +130,13 @@ export const usePeer = (dispatch, state) => {
             })
 
             pr.on("disconnected", () => {
-                console.log("Peer disconnected. Not attempting to reconnect because peer is destroyed.")
+                //console.log("Peer disconnected. Not attempting to reconnect because peer is destroyed.")
             })
 
             pr.on("error", (err) => {
-                console.log("Peer error:", err)
+                //console.log("Peer error:", err)
                 if (err.type === "unavailable-id") {
-                    console.log("ID is taken. Reconnecting...")
+                    //console.log("ID is taken. Reconnecting...")
                     pr.destroy()
                 }
             })
@@ -146,12 +148,10 @@ export const usePeer = (dispatch, state) => {
     useEffect(() => {
         if (!conn || connInitializedRef.current) return // Check if connection is already initialized
 
-        conn.on("open", async (a) => {
+        conn.on("open", async () => {
             connInitializedRef.current = true // Mark connection as initialized
-            console.log("Connection opened with peer:", conn.peer)
+            //console.log("Connection opened with peer:", conn.peer)
             dispatch({ type: "SET_PEER", payload: { conn } })
-            console.log("con", conn)
-            console.log("a", a)
 
             let callToSet
             if (state.mode === invType.Secure) {
@@ -226,7 +226,7 @@ export const usePeer = (dispatch, state) => {
         })
 
         conn.on("close", () => {
-            console.log("Connection closed")
+            //console.log("Connection closed")
             cleanupAfterDisconnect()
             connInitializedRef.current = false // Reset connection initialization flag on close
             localStorage.removeItem("savedRecipient") // Clean up on connection close
@@ -256,7 +256,7 @@ export const usePeer = (dispatch, state) => {
             dispatch({ type: "SET_PEER", payload: { remoteStream: streamToSet } })
         })
         call.on("close", () => {
-            console.log("Call closed")
+            //console.log("Call closed")
             handleDisconnect()
         })
         call.on("error", (err) => {
@@ -265,7 +265,7 @@ export const usePeer = (dispatch, state) => {
     }, [call])
 
     const connect = (recId) => {
-        console.log("Attempting to connect to peer:", recId)
+        //console.log("Attempting to connect to peer:", recId)
         const connection = peer.connect(recId, { metadata: state.account.wallet.publicKey })
         setConn(connection)
 
@@ -280,12 +280,12 @@ export const usePeer = (dispatch, state) => {
     }
 
     const handleDisconnect = () => {
-        console.log("Handling disconnect...")
+        //console.log("Handling disconnect...")
 
         if (conn) {
             conn.send({ type: "disconnect" })
             setTimeout(() => {
-                console.log("Closing connection...")
+                //console.log("Closing connection...")
                 conn.close()
                 cleanupAfterDisconnect()
                 connInitializedRef.current = false // Reset connection initialization flag
@@ -295,7 +295,7 @@ export const usePeer = (dispatch, state) => {
         }
 
         if (call) {
-            console.log("Closing call...")
+            //console.log("Closing call...")
             call.close()
         }
     }
@@ -306,8 +306,6 @@ export const usePeer = (dispatch, state) => {
         dispatch({ type: "SET_MODE", payload: null })
         dispatch({ type: "SET_MODAL", payload: null })
         dispatch({ type: "CONNECT", payload: false })
-        //localStorage.removeItem("savedRecipient") // Clean up on disconnect
-        //localStorage.removeItem("savedTimestamp")
     }
 
     const stopSharedScreen = () => {
@@ -318,9 +316,9 @@ export const usePeer = (dispatch, state) => {
     }
 
     const handleData = (data) => {
-        console.log("Handling data:", data)
+        //console.log("Handling data:", data)
         if (data.type === "disconnect") {
-            console.log("Disconnect message received")
+            //console.log("Disconnect message received")
             cleanupAfterDisconnect()
         } else if (data.type === "stopScreen") {
             stopSharedScreen()

@@ -11,7 +11,7 @@ export default function Status() {
 
     useEffect(() => {
         if (state.peer) {
-            console.log(state.peer)
+            //console.log(state.peer)
         }
     }, [state.peer])
 
