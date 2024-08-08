@@ -7,8 +7,6 @@ import useQueryParams from "../hooks/useQueryParams"
 import useInvitationLink from "./useInvitationLink"
 import { EncryptText, DecryptText, EncryptStream, DecryptStream, streamToBase64 } from "../utils/encdec"
 
-const RELOAD_TIME_LIMIT = 30000 // 30 seconds time limit to reload the saved peer connection
-
 export const usePeer = (dispatch, state) => {
     const [peer, setPeer] = useState(null)
     const [conn, setConn] = useState(null)
