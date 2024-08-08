@@ -1,5 +1,5 @@
 *** 07/08 ***
-- invitation modal
+//- invitation modal
     //- description
     //- join
 - text chat

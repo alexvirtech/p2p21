@@ -3,8 +3,8 @@ import { getAccountBackup } from "./localDB"
 // main menu
 export const pages = [
     { label: "Start",border: true },    
-    { label: "Basic" },
-    { label: "Advanced",border: true },    
+    /* { label: "Basic" },
+    { label: "Advanced",border: true },     */
     { label: "Contacts" },
     /* { label: "Groups" },
     { label: "Projects" }, */
