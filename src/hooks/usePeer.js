@@ -4,7 +4,7 @@ import { peerConfig } from "../utils/config"
 import { useStream } from "./useStream"
 import { invType } from "../utils/common"
 import useQueryParams from "../hooks/useQueryParams"
-import { EncryptText, DecryptText, EncryptStream, DecryptStream } from "../utils/encdec"
+import { EncryptText, DecryptText, EncryptStream, DecryptStream, streamToBase64 } from "../utils/encdec"
 
 const RELOAD_TIME_LIMIT = 30000 // 30 seconds time limit to reload the saved peer connection
 
@@ -16,7 +16,6 @@ export const usePeer = (dispatch, state) => {
     const { localStream } = useStream("video")
     const peerInitializedRef = useRef(false) // Track if the peer has been initialized
     const connInitializedRef = useRef(false)
-    const accRef = useRef()
 
     const { id, tp, pk } = useQueryParams()
 
@@ -77,6 +76,8 @@ export const usePeer = (dispatch, state) => {
                         //incomingCall.metadata.pk,
                     )
                     streamToSend = encryptedStream
+                    //console.log("peer - on call")
+                    //console.log("localStream enc", encryptedStream)
                 }
 
                 incomingCall.answer(streamToSend)
@@ -91,6 +92,8 @@ export const usePeer = (dispatch, state) => {
                         )
                     }
                     setRemoteStream(streamToSet)
+                    //console.log("peer - on call - incomingCall - on stream")
+                    //console.log("streamToSet dec", streamToSet)
                     dispatch({ type: "SET_PEER", payload: { remoteStream: streamToSet } })
                 })
             })
@@ -99,11 +102,11 @@ export const usePeer = (dispatch, state) => {
                 setConn(connection)
                 console.log("Connection established with peer:", connection.peer)
 
-                console.log("md",connection.metadata)
+                console.log("md", connection.metadata)
+                dispatch({ type: "SET_RECIPIENT_PK", payload: connection.metadata })
 
                 connection.on("open", () => {
                     console.log("Connection is now open with peer:", connection.peer)
-                    connection.send({ type: "pk", payload: state.account.wallet.publicKey })
                 })
 
                 connection.on("data", async (data) => {
@@ -116,6 +119,8 @@ export const usePeer = (dispatch, state) => {
                             state.account.wallet.privateKey,
                         )
                         handleData(JSON.parse(decryptedData))
+                        //console.log("connection - on data")
+                        //console.log("decryptedData - dec", decryptedData)
                     } else {
                         handleData(data)
                     }
@@ -145,9 +150,8 @@ export const usePeer = (dispatch, state) => {
             connInitializedRef.current = true // Mark connection as initialized
             console.log("Connection opened with peer:", conn.peer)
             dispatch({ type: "SET_PEER", payload: { conn } })
-            //conn.send({ type: "pk", payload: state.account.wallet.publicKey })
-            console.log('con',conn)
-            console.log('a',a)
+            console.log("con", conn)
+            console.log("a", a)
 
             let callToSet
             if (state.mode === invType.Secure) {
@@ -156,7 +160,27 @@ export const usePeer = (dispatch, state) => {
                     state.account.wallet.privateKey,
                     state.recipient.publicKey,
                 )
-                callToSet = peer.call(conn.peer, encryptedStream, { metadata: { encryptedAesKey, iv, pk: state.account.wallet.publicKey } })
+
+                // ** for presentation purposes - befor and after encryption ** //
+                // console.log("connection - on open - send localStream")
+                // Check that the stream is valid before converting to base64
+                /* if (localStream instanceof MediaStream) {
+                    const originalStreamBase64 = await streamToBase64(localStream)
+                    console.log("localStream original", originalStreamBase64)
+                } else {
+                    console.error("localStream is not a valid MediaStream")
+                }
+
+                if (encryptedStream instanceof MediaStream) {
+                    const encryptedStreamBase64 = await streamToBase64(encryptedStream)
+                    console.log("localStream encrypted", encryptedStreamBase64)
+                } else {
+                    console.error("encryptedStream is not a valid MediaStream")
+                } */
+
+                callToSet = peer.call(conn.peer, encryptedStream, {
+                    metadata: { encryptedAesKey, iv, pk: state.account.wallet.publicKey },
+                })
             } else {
                 callToSet = peer.call(conn.peer, localStream)
             }
@@ -177,6 +201,8 @@ export const usePeer = (dispatch, state) => {
                         state.account.wallet.privateKey,
                     )
                 }
+                //console.log("connection - on open - callToSet - on track")
+                //console.log("streamToSet dec", streamToSet)
                 setRemoteStream(streamToSet)
                 dispatch({ type: "SET_PEER", payload: { remoteStream: streamToSet } })
             }
@@ -191,6 +217,8 @@ export const usePeer = (dispatch, state) => {
                     data.iv,
                     state.account.privateKey,
                 )
+                //console.log("connection - on data")
+                //console.log("decrypted data - dec", decryptedData)
                 handleData(JSON.parse(decryptedData))
             } else {
                 handleData(data)
@@ -222,6 +250,8 @@ export const usePeer = (dispatch, state) => {
                     state.account.wallet.privateKey,
                 )
             }
+            //console.log("call - on stream")
+            //console.log("streamToSet dec", streamToSet)
             setRemoteStream(streamToSet)
             dispatch({ type: "SET_PEER", payload: { remoteStream: streamToSet } })
         })
@@ -236,7 +266,7 @@ export const usePeer = (dispatch, state) => {
 
     const connect = (recId) => {
         console.log("Attempting to connect to peer:", recId)
-        const connection = peer.connect(recId,{pk:state.account.wallet.publicKey})
+        const connection = peer.connect(recId, { metadata: state.account.wallet.publicKey })
         setConn(connection)
 
         connection.on("open", () => {

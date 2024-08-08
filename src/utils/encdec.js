@@ -119,3 +119,35 @@ export async function DecryptStream(encryptedStream, encryptedAesKey, iv, privat
         throw error
     }
 }
+
+export const streamToBase64 = async (stream) => {
+    if (!(stream instanceof MediaStream)) {
+        console.error("Provided stream is not a valid MediaStream:", stream)
+        throw new TypeError("Provided stream is not a valid MediaStream")
+    }
+
+    return new Promise((resolve, reject) => {
+        const chunks = []
+        const mediaRecorder = new MediaRecorder(stream)
+
+        mediaRecorder.ondataavailable = (event) => {
+            chunks.push(event.data)
+        }
+
+        mediaRecorder.onstop = () => {
+            const blob = new Blob(chunks, { type: "video/webm" })
+            const reader = new FileReader()
+            reader.onloadend = () => {
+                const base64String = reader.result.split(",")[1] // Get the base64 part
+                resolve(base64String)
+            }
+            reader.onerror = (error) => reject(error)
+            reader.readAsDataURL(blob) // Convert blob to base64 string
+        }
+
+        mediaRecorder.start()
+        setTimeout(() => {
+            mediaRecorder.stop()
+        }, 1000) // Record for 1 second
+    })
+}
