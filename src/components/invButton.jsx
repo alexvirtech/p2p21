@@ -7,13 +7,7 @@ export default function InvButton({title}) {
 const { state, dispatch } = useContext(Context)
 
     const invite = () => {        
-        //setType(type)
-        if(title === invType.Join){ // Join
-            // 
-        }else{ // Secure, Basic, Advanced
-            dispatch({ type: "SET_MODAL", payload: "invitation", mode:title })
-        }
-        
+        dispatch({ type: "SET_MODAL", payload: title === invType.Join ? "join" : "invitation", mode:title })        
     }
 
     return (

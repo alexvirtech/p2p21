@@ -1,9 +1,11 @@
 *** 07/08 ***
 - invitation modal
-    - description
+    //- description
     - join
 - text chat
-- advanced
+- responsible layout
+    - basic, secure
+    - advanced
 - refactory
 
 *** 31/07 ***

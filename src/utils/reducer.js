@@ -27,6 +27,7 @@ export const InitState = {
     isChat: true,
     isVideo: true,
     disconnectExt: false,
+    connectExt: false,
 }
 
 export const reducer = (state, action) => {
@@ -95,8 +96,10 @@ export const reducer = (state, action) => {
             return { ...state, recipient: action.payload.recipient, mode: action.payload.tp }
         case "SET_RECIPIENT_PK":
             return { ...state, recipient: { ...state.recipient, publicKey: action.payload } }
-        case "DISCONNECT_EXT":            
+        case "DISCONNECT_EXT":
             return { ...state, disconnectExt: action.payload }
+        case "CONNECT_EXT":
+            return { ...state, connectExt: action.payload }
         /* temp */
         case "CONNECT":
             return { ...state, isConnected: action.payload }

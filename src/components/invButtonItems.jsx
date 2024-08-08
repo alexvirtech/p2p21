@@ -29,7 +29,7 @@ const InvButtonItems = ({title}) => {
         },
         {
             title: invType.Join,
-            description: <>Join a friend's ExtraSafe chat session by an invitation link.</>,
+            description: <>Join a friend's ExtraSafe communication session by an invitation link.</>,
         },
     ]    
     return items.find((item) => item.title === title)?.description

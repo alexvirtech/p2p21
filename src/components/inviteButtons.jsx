@@ -3,6 +3,7 @@ import { Context } from "../utils/context"
 import { invType } from "../utils/common"
 import Invitation from "../modals/invitation"
 import InvButton from "./invButton"
+import Join from "../modals/join"
 
 export default function InviteButtons() {
     const { state, dispatch } = useContext(Context)
@@ -33,6 +34,7 @@ export default function InviteButtons() {
                 </div> */}
             </div>
             {state.modal === "invitation" && <Invitation close={closeModal} />}
+            {state.modal === "join" && <Join close={closeModal} />}
         </div>
     )
 }

@@ -81,13 +81,13 @@ export const usePeer = (dispatch, state) => {
 
                 incomingCall.answer(streamToSend)
                 incomingCall.on("stream", async (remoteStream) => {
-                    if(!incomingCall.metadata){
-                        console.log("Metadata not found in incoming call")
-                        handleDisconnect()
-                        return
-                    }
                     let streamToSet = remoteStream
                     if (state.mode === invType.Secure) {
+                        if (!incomingCall.metadata) {
+                            console.log("Metadata not found in incoming call")
+                            handleDisconnect()
+                            return
+                        }
                         streamToSet = await DecryptStream(
                             remoteStream,
                             incomingCall.metadata.encryptedAesKey,
@@ -104,7 +104,7 @@ export const usePeer = (dispatch, state) => {
 
             pr.on("connection", (connection) => {
                 setConn(connection)
-                
+
                 dispatch({ type: "SET_RECIPIENT_PK", payload: connection.metadata })
 
                 connection.on("open", () => {
@@ -283,7 +283,9 @@ export const usePeer = (dispatch, state) => {
         //console.log("Handling disconnect...")
 
         if (conn) {
-            conn.send({ type: "disconnect" })
+            if (conn.open) {
+                conn.send({ type: "disconnect" })
+            }
             setTimeout(() => {
                 //console.log("Closing connection...")
                 conn.close()
@@ -340,6 +342,16 @@ export const usePeer = (dispatch, state) => {
             }, 1000)
         }
     }, [state.disconnectExt])
+
+    useEffect(() => {
+        if (state.connectExt) {
+            handleDisconnect()
+            dispatch({ type: "DISCONNECT_EXT", payload: true })
+            setTimeout(() => {
+                dispatch({ type: "DISCONNECT_EXT", payload: false })
+            }, 1000)
+        }
+    }, [state.connectExt])
 
     return { peer, connect, disconnect: handleDisconnect, handleDisconnect }
 }

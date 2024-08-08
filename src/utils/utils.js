@@ -1,3 +1,5 @@
+import { ethers } from "ethers"
+
 export const downloadJSON = (jsonObject, filename = "data.json") => {
     // Convert JSON object to string
     const jsonString = JSON.stringify(jsonObject, null, 2)
@@ -23,10 +25,6 @@ export const downloadJSON = (jsonObject, filename = "data.json") => {
     // Remove the link from the document
     document.body.removeChild(link)
 }
-
-/* // Example usage:
-const data = { name: "John Doe", age: 30, city: "New York" };
-downloadJSON(data, 'example.json'); */
 
 export const capitalize = (str) => {
     if (typeof str !== "string" || str.length === 0) return ""
@@ -62,5 +60,51 @@ export const shareLink = async (title, url) => {
         }
     } else {
         console.warn("Web Share API is not supported in this browser")
+    }
+}
+
+const VALID_TYPES = ["Basic", "Advanced", "Secure"]
+
+const isValidPublicKey = (pk) => {
+    try {
+        // Check if the public key is in a valid format
+        const address = ethers.computeAddress(pk)
+        return ethers.isAddress(address) // Validate the derived address
+    } catch (e) {
+        return false
+    }
+}
+
+export const validateLink = (link) => {
+    try {
+        const url = new URL(link)
+
+        // Check protocol
+        if (url.protocol !== "http:" && url.protocol !== "https:") {
+            return { valid: false, error: "Invalid protocol. Must be http or https." }
+        }
+
+        // Check query parameters
+        const id = url.searchParams.get("id")
+        const tp = url.searchParams.get("tp")
+        const pk = url.searchParams.get("pk")
+
+        if (!id || !tp || !pk) {
+            return { valid: false, error: "Missing required query parameters (id, tp, pk)." }
+        }
+
+        // Validate tp
+        if (!VALID_TYPES.includes(tp)) {
+            return { valid: false, error: `Invalid type. Must be one of ${VALID_TYPES.join(", ")}.` }
+        }
+
+        // Validate pk as a public key
+        if (!isValidPublicKey(pk)) {
+            return { valid: false, error: "Invalid public key." }
+        }
+
+        return { valid: true, error: "" }
+    } catch (e) {
+        return { valid: false, error: "Invalid URL format." }
     }
 }
