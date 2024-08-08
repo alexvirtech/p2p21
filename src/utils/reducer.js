@@ -27,7 +27,7 @@ export const InitState = {
     isChat: true,
     isVideo: true,
     disconnectExt: false,
-    connectExt: false,
+    connectExt: null,
 }
 
 export const reducer = (state, action) => {

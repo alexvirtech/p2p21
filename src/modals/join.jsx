@@ -26,7 +26,7 @@ export default function Join({ close }) {
     }, [link])
 
     const handleJoin = () => {
-        // tbd
+        dispatch({ type: "CONNECT_EXT", payload: link })
     }
 
     return (

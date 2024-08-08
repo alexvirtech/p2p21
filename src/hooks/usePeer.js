@@ -4,6 +4,7 @@ import { peerConfig } from "../utils/config"
 import { useStream } from "./useStream"
 import { invType } from "../utils/common"
 import useQueryParams from "../hooks/useQueryParams"
+import useInvitationLink from "./useInvitationLink"
 import { EncryptText, DecryptText, EncryptStream, DecryptStream, streamToBase64 } from "../utils/encdec"
 
 const RELOAD_TIME_LIMIT = 30000 // 30 seconds time limit to reload the saved peer connection
@@ -336,7 +337,7 @@ export const usePeer = (dispatch, state) => {
     useEffect(() => {
         if (state.disconnectExt) {
             handleDisconnect()
-            dispatch({ type: "DISCONNECT_EXT", payload: true })
+            //dispatch({ type: "DISCONNECT_EXT", payload: true }) //?
             setTimeout(() => {
                 dispatch({ type: "DISCONNECT_EXT", payload: false })
             }, 1000)
@@ -345,11 +346,13 @@ export const usePeer = (dispatch, state) => {
 
     useEffect(() => {
         if (state.connectExt) {
-            handleDisconnect()
-            dispatch({ type: "DISCONNECT_EXT", payload: true })
-            setTimeout(() => {
-                dispatch({ type: "DISCONNECT_EXT", payload: false })
-            }, 1000)
+            const { idj, tpj, pkj } = useInvitationLink(state.connectExt)
+            if(idj && tpj && pkj) {
+                dispatch({ type: "SET_RECIPIENT", payload: { recipient: { address: idj, publicKey: pkj }, tp: tpj } })
+                setTimeout(() => {
+                    dispatch({ type: "CONNECT_EXT", payload: null })
+                }, 1000)
+            }                               
         }
     }, [state.connectExt])
 
