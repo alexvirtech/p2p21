@@ -24,7 +24,8 @@ export default function Invitation({ close }) {
     return (
         <LayoutModal title="Invitation Link" close={() => close()}>
             <div class="pb-1 pt-2 text-xl">
-                <b title="basic mode">{`${capitalize(state.mode)} mode`}</b>                
+                {/* <b title="basic mode">{`${capitalize(state.mode)} mode`}</b>   */}
+                <b>Start Private & Secure chat</b>                  
             </div>
             <div class="pb-4 text-sm low:text-md"><InvButtonItems title={state.mode}/></div>
             <div class="flex justify-start gap-2 text-sm">

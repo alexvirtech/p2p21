@@ -16,7 +16,7 @@ const Basic = () => {
     }
 
     return <LayoutDash 
-        video={[]} 
+        video={[<Video stream={state.localStream} name="my video" />]} 
         monitor={<Block title="temp for monitor"/>} 
         chat={<Block title="temp for chat"/>}
         invite={<Block title="temp for invitation buttons"/>}/>

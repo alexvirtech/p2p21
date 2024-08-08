@@ -1,11 +1,11 @@
 *** 07/08 ***
 - invitation modal
     //- description
-    - join
+    //- join
 - text chat
-- responsible layout
-    - basic, secure
-    - advanced
+//- responsive layout for 2 participants
+- main menu - responsivity    
+- account menu - responsivity
 - refactory
 
 *** 31/07 ***

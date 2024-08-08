@@ -9,7 +9,7 @@ export const InitState = {
     recipient: null, // {address: [remote address], publicKey: [remote public key]}
     tempAcc: null,
     modal: null,
-    mode: null, //basic,advanced,secure
+    mode: "secure", //basic,advanced - not in use
     page: "Start",
     tabs: ["Dashboard", "Screen", "Whiteboard", "Documents"],
     tab: "Dashboard",
@@ -22,10 +22,12 @@ export const InitState = {
     messages: [],
     template: null,
     // temp for layout creation
-    connections: 3,
+    connections: 1,
+    tempConnected: false,
     isConnected: false,
-    isChat: true,
+    isChat: false,
     isVideo: true,
+    isMonitor: false,
     disconnectExt: false,
     connectExt: null,
 }
@@ -107,6 +109,10 @@ export const reducer = (state, action) => {
             return { ...state, isChat: action.payload }
         case "SHOW_VIDEO":
             return { ...state, isVideo: action.payload }
+        case "SHOW_MONITOR":
+            return { ...state, isMonitor: action.payload }
+        case "SET_TEMP_CONNECTION":
+            return { ...state, tempConnected: action.payload }
         default:
             return state
     }

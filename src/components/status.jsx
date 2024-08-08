@@ -1,9 +1,11 @@
 import { useContext, useEffect, useState } from "preact/hooks"
 import { Context } from "../utils/context"
-import { DisconnectIcon, ConnectIcon, ChatIcon, ChatCloseIcon, VideoIcon, VideoCloseIcon } from "../utils/icons"
+import { DisconnectIcon, ConnectIcon, ChatIcon, ChatCloseIcon, VideoIcon, VideoCloseIcon, MonitorIcon, MonitorCloseIcon, JoinIcon } from "../utils/icons"
 import ConnectMenu from "./connectMenu"
 import { usePeer } from "../hooks/usePeer"
 import Invitation from "../modals/invitation"
+import Join from "../modals/join"
+import { invType } from "../utils/common"
 
 export default function Status() {
     const { state, dispatch } = useContext(Context)
@@ -14,6 +16,10 @@ export default function Status() {
             //console.log(state.peer)
         }
     }, [state.peer])
+
+    const closeModal = () => {
+        dispatch({ type: "SET_MODAL", payload: null })
+    }
 
     const handleDisconnect = () => {
         dispatch({ type: "DISCONNECT_EXT", payload: true })
@@ -26,23 +32,24 @@ export default function Status() {
         <div class="p-3 border-t border-gray-400 text-sm h-[62px] flex items-center justify-center gap-2">
             {state.isConnected ? (
                 <>
-                    {state.isVideo ? (
+                    {state.isMonitor ? (
                         <div
                             class="cursor-pointer rounded bg-blue-500 hover:bg-blue-700 text-white p-2 aspect-w-1 aspect-h-1"
-                            onClick={() => dispatch({ type: "SHOW_VIDEO", payload: false })}
+                            onClick={() => dispatch({ type: "SHOW_MONITOR", payload: false })}
                             title="temp button"
                         >
-                            <VideoCloseIcon />
+                            <MonitorCloseIcon />
                         </div>
                     ) : (
                         <div
                             class="cursor-pointer rounded bg-blue-500 hover:bg-blue-700 text-white p-2 aspect-w-1 aspect-h-1"
-                            onClick={() => dispatch({ type: "SHOW_VIDEO", payload: true })}
+                            onClick={() => dispatch({ type: "SHOW_MONITOR", payload: true })}
                             title="temp button"
                         >
-                            <VideoIcon />
+                            <MonitorIcon />
                         </div>
                     )}
+
                     {state.isChat ? (
                         <div
                             class="cursor-pointer rounded bg-blue-500 hover:bg-blue-700 text-white p-2 aspect-w-1 aspect-h-1"
@@ -68,17 +75,25 @@ export default function Status() {
                     </div>
                 </>
             ) : (
-                <div class="relative">
+                <div class="relative flex justify-center gap-2">
                     <div
                         class="cursor-pointer rounded bg-blue-500 hover:bg-blue-700 text-white py-1 px-3 z-10 flex justify-center items-center gap-2"
-                        onClick={() => setShowConnectMenu(!showConnectMenu)}
-                        title="temp button"
-                    >                        
+                        onClick={() =>dispatch({ type: "SET_MODAL", payload: "invitation", mode:invType.Secure })}
+                        title="start secure call"
+                    >
                         <ConnectIcon />
-                        <div class="text-lg">Start Call</div>
+                        <div class="text-lg">Invite</div>
                     </div>
-                    {showConnectMenu && <ConnectMenu close={() => setShowConnectMenu(false)} />}
-                    {state.modal === "invitation" && <Invitation close={() => dispatch({ type: "SET_MODAL", payload: null })} />}
+                    <div
+                        class="cursor-pointer rounded bg-blue-500 hover:bg-blue-700 text-white py-1 px-3 z-10 flex justify-center items-center gap-2"
+                        onClick={() =>dispatch({ type: "SET_MODAL", payload: "join" })}
+                        title="start secure call"
+                    >
+                        <JoinIcon />
+                        <div class="text-lg">Join</div>
+                    </div>
+                    {state.modal === "invitation" && <Invitation close={()=>closeModal()} />}
+                    {state.modal === "join" && <Join close={()=>closeModal()} />}
                 </div>
             )}
         </div>
