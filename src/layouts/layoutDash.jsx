@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from "preact/hooks"
 import { Context } from "../utils/context"
 
-const LayoutDash = ({ video, monitor, chat, invite }) => {
+const LayoutDash = ({ video, monitor, chat }) => {
     const { state, dispatch } = useContext(Context)
     const [containerStyle, setContainerStyle] = useState({})
 

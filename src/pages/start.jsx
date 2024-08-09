@@ -3,6 +3,7 @@ import { Context } from "../utils/context"
 import { usePeer } from "../hooks/usePeer"
 import Video from "../components/video"
 import LayoutDash from "../layouts/layoutDash"
+import Chat from "../components/chat"
 
 const Start = () => {
     const { state, dispatch } = useContext(Context)
@@ -17,8 +18,8 @@ const Start = () => {
         <LayoutDash
             video={[<Video stream={state.localStream}/>,<Video stream={state.remoteStream} />]}
             monitor={<Block title="temp for monitor" />}
-            chat={<Block title="temp for chat" />}
-            invite={<Block title="temp for invitation buttons" />}
+            chat={<Block title="temp for chat" />}            
+            /* chat={<Chat />} */
         />
     )
 }
