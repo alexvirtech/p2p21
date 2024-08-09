@@ -108,7 +108,7 @@ export const usePeer = (dispatch, state) => {
                     //console.log("Connection is now open with peer:", connection.peer)
                 })
 
-                connection.on("data", async (data) => {
+                /* connection.on("data", async (data) => {
                     //console.log("Received data:", data)
                     if (typeof data === "object" && data.encryptedText) {
                         const decryptedData = await DecryptText(
@@ -123,7 +123,7 @@ export const usePeer = (dispatch, state) => {
                     } else {
                         handleData(data)
                     }
-                })
+                }) */
             })
 
             pr.on("disconnected", () => {
