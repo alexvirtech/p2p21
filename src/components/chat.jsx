@@ -7,6 +7,10 @@ export default function Chat() {
     const allMessages = useRef(null)
     const textInput = useRef(null)
 
+    useEffect(() => {
+        textInput.current.focus()
+    }, [])
+
     const send = (e) => {
         e.preventDefault()
         e.stopPropagation()
@@ -35,7 +39,7 @@ export default function Chat() {
             <div class="flex flex-col w-full grow h-full min-h-0">
                 <div class="flex flex-col flex-grow min-h-0 overflow-hidden">
                     <div
-                        class="border border-gray-400 w-full flex-grow mb-4 rounded overflow-y-auto overflow-x-hidden px-4 py-2"
+                        class="border border-gray-400 w-full flex-grow mb-4 rounded-md overflow-y-auto overflow-x-hidden px-4 py-2"
                         ref={allMessages}
                     >
                         {state.messages.map((msg) => (
@@ -47,12 +51,12 @@ export default function Chat() {
                     <div class="flex justify-between gap-0">
                         <input
                             type="text"
-                            class="border-l border-t border-b border-gray-400 p-2 rounded-l grow"
+                            class="border-l border-t border-b border-gray-400 p-1.5 rounded-l-md grow"
                             ref={textInput}
                         />
                         <button
                             type="submit"
-                            class="h-auto bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-r"
+                            class="h-auto bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 pl-2.5 pr-3 rounded-r-md"
                             id="sendButton"
                         >
                             <SendMessageIcon />
