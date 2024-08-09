@@ -1,6 +1,5 @@
-import { mode } from "crypto-js"
-import { defAccount, invType } from "./common"
-import { encrypt, decrypt } from "./crypto"
+import { defAccount } from "./common"
+import { encrypt } from "./crypto"
 
 export const InitState = {
     accounts: [],
@@ -9,7 +8,6 @@ export const InitState = {
     recipient: null, // {address: [remote address], publicKey: [remote public key]}
     tempAcc: null,
     modal: null,
-    mode: "secure", //basic,advanced - not in use
     page: "Start",
     tabs: ["Dashboard", "Screen", "Whiteboard", "Documents"],
     tab: "Dashboard",
@@ -72,9 +70,7 @@ export const reducer = (state, action) => {
         case "SET_PAGE":
             return { ...state, page: action.payload }
         case "SET_MODAL":
-            return { ...state, modal: action.payload, ...(action.mode && { mode: action.mode }) }
-        case "SET_MODE":
-            return { ...state, mode: action.payload }
+            return { ...state, modal: action.payload }        
         case "SET_TEMPLATE": // TBR
             return { ...state, template: action.payload }
         case "SET_PEER":
@@ -95,7 +91,7 @@ export const reducer = (state, action) => {
         case "SET_TEMP_STREAM":
             return { ...state, tempStream: action.payload }
         case "SET_RECIPIENT":
-            return { ...state, recipient: action.payload.recipient, mode: action.payload.tp }
+            return { ...state, recipient: action.payload.recipient }
         case "SET_RECIPIENT_PK":
             return { ...state, recipient: { ...state.recipient, publicKey: action.payload } }
         case "DISCONNECT_EXT":

@@ -1,8 +1,8 @@
 import { useState, useEffect, useContext, useRef } from "preact/hooks"
 import { Context } from "../utils/context"
 import LayoutModal from "../layouts/layoutModal"
-import { capitalize, validateLink } from "../utils/utils"
-import { invType } from "../utils/common"
+import { validateLink } from "../utils/utils"
+import { AcceptIcon } from "../utils/icons"
 
 export default function Join({ close }) {
     const { state, dispatch } = useContext(Context)
@@ -32,7 +32,7 @@ export default function Join({ close }) {
     return (
         <LayoutModal title="Join with Invitation Link" close={() => close()}>
             <div class="pb-1 pt-2 text-xl">
-                <b title="basic mode">{`${capitalize(invType.Join)} communication session`}</b>
+                <b title="basic mode">Join communication session</b>
             </div>
             <div class="pb-4 text-sm low:text-md">Paste invitation link into the text area in order to start.</div>
             <div class="flex justify-start gap-2 text-sm">
@@ -48,11 +48,12 @@ export default function Join({ close }) {
                     type="button"
                     class={`h-auto ${
                         valid ? "bg-blue-500 hover:bg-blue-700" : "bg-slate-300"
-                    }  text-white font-bold flex justify-center py-2 px-8 rounded my-4 disabled:bg-gray-300`}
+                    }  text-white text-md items-center flex justify-center gap-2 py-2 px-4 rounded my-4 disabled:bg-gray-300`}
                     onClick={handleJoin}
                     desabled={!valid}
                 >
-                    Accept Invitation
+                    <AcceptIcon />
+                    <div>Accept Invitation</div>
                 </button>
                 <div class="text-red-600 my-5 text-xs">{error}</div>
             </div>

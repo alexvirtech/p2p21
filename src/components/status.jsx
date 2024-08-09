@@ -1,15 +1,11 @@
 import { useContext, useEffect, useState } from "preact/hooks"
 import { Context } from "../utils/context"
 import { DisconnectIcon, ConnectIcon, ChatIcon, ChatCloseIcon, VideoIcon, VideoCloseIcon, MonitorIcon, MonitorCloseIcon, JoinIcon } from "../utils/icons"
-import ConnectMenu from "./connectMenu"
-import { usePeer } from "../hooks/usePeer"
 import Invitation from "../modals/invitation"
 import Join from "../modals/join"
-import { invType } from "../utils/common"
 
 export default function Status() {
     const { state, dispatch } = useContext(Context)
-    const [showConnectMenu, setShowConnectMenu] = useState(false)
 
     useEffect(() => {
         if (state.peer) {
@@ -78,7 +74,7 @@ export default function Status() {
                 <div class="relative flex justify-center gap-2">
                     <div
                         class="cursor-pointer rounded bg-blue-500 hover:bg-blue-700 text-white py-1 px-3 z-10 flex justify-center items-center gap-2"
-                        onClick={() =>dispatch({ type: "SET_MODAL", payload: "invitation", mode:invType.Secure })}
+                        onClick={() =>dispatch({ type: "SET_MODAL", payload: "invitation" })}
                         title="start secure call"
                     >
                         <ConnectIcon />

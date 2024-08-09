@@ -63,8 +63,6 @@ export const shareLink = async (title, url) => {
     }
 }
 
-const VALID_TYPES = ["Basic", "Advanced", "Secure"]
-
 const isValidPublicKey = (pk) => {
     try {
         // Check if the public key is in a valid format
@@ -86,17 +84,11 @@ export const validateLink = (link) => {
 
         // Check query parameters
         const id = url.searchParams.get("id")
-        const tp = url.searchParams.get("tp")
         const pk = url.searchParams.get("pk")
 
-        if (!id || !tp || !pk) {
-            return { valid: false, error: "Missing required query parameters (id, tp, pk)." }
-        }
-
-        // Validate tp
-        if (!VALID_TYPES.includes(tp)) {
-            return { valid: false, error: `Invalid type. Must be one of ${VALID_TYPES.join(", ")}.` }
-        }
+        if (!id || !pk) {
+            return { valid: false, error: "Missing required query parameters (id, pk)." }
+        }        
 
         // Validate pk as a public key
         if (!isValidPublicKey(pk)) {

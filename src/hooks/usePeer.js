@@ -2,7 +2,6 @@ import { useEffect, useState, useRef } from "preact/hooks"
 import { Peer } from "peerjs"
 import { peerConfig } from "../utils/config"
 import { useStream } from "./useStream"
-import { invType } from "../utils/common"
 import useQueryParams from "../hooks/useQueryParams"
 import useInvitationLink from "./useInvitationLink"
 import { EncryptText, DecryptText, EncryptStream, DecryptStream, streamToBase64 } from "../utils/encdec"
@@ -16,13 +15,13 @@ export const usePeer = (dispatch, state) => {
     const peerInitializedRef = useRef(false) // Track if the peer has been initialized
     const connInitializedRef = useRef(false)
 
-    const { id, tp, pk } = useQueryParams()
+    const { id, pk } = useQueryParams()
 
     useEffect(() => {
-        if (id && tp && pk) {
-            dispatch({ type: "SET_RECIPIENT", payload: { recipient: { address: id, publicKey: pk }, tp } })
+        if (id && pk) {
+            dispatch({ type: "SET_RECIPIENT", payload: { recipient: { address: id, publicKey: pk } } })
         }
-    }, [id, tp, pk])
+    }, [id, pk])
 
     useEffect(() => {
         if (state.recipient && state.recipient.address && peer) {
@@ -67,7 +66,7 @@ export const usePeer = (dispatch, state) => {
                 dispatch({ type: "SET_PEER", payload: { call: incomingCall } })
                 let streamToSend = localStream
 
-                if (state.mode === invType.Secure && localStream) {
+                if (localStream) {
                     const { encryptedStream } = await EncryptStream(
                         localStream,
                         state.account.wallet.privateKey,
@@ -81,19 +80,18 @@ export const usePeer = (dispatch, state) => {
                 incomingCall.answer(streamToSend)
                 incomingCall.on("stream", async (remoteStream) => {
                     let streamToSet = remoteStream
-                    if (state.mode === invType.Secure) {
-                        if (!incomingCall.metadata) {
-                            console.log("Metadata not found in incoming call")
-                            handleDisconnect()
-                            return
-                        }
-                        streamToSet = await DecryptStream(
-                            remoteStream,
-                            incomingCall.metadata.encryptedAesKey,
-                            incomingCall.metadata.iv,
-                            state.account.wallet.privateKey,
-                        )
+
+                    if (!incomingCall.metadata) {
+                        console.log("Metadata not found in incoming call")
+                        handleDisconnect()
+                        return
                     }
+                    streamToSet = await DecryptStream(
+                        remoteStream,
+                        incomingCall.metadata.encryptedAesKey,
+                        incomingCall.metadata.iv,
+                        state.account.wallet.privateKey,
+                    )
                     setRemoteStream(streamToSet)
                     //console.log("peer - on call - incomingCall - on stream")
                     //console.log("streamToSet dec", streamToSet)
@@ -112,7 +110,7 @@ export const usePeer = (dispatch, state) => {
 
                 connection.on("data", async (data) => {
                     //console.log("Received data:", data)
-                    if (state.mode === invType.Secure && typeof data === "object" && data.encryptedText) {
+                    if (typeof data === "object" && data.encryptedText) {
                         const decryptedData = await DecryptText(
                             data.encryptedText,
                             data.encryptedAesKey,
@@ -153,17 +151,16 @@ export const usePeer = (dispatch, state) => {
             dispatch({ type: "SET_PEER", payload: { conn } })
 
             let callToSet
-            if (state.mode === invType.Secure) {
-                const { encryptedStream, encryptedAesKey, iv } = await EncryptStream(
-                    localStream,
-                    state.account.wallet.privateKey,
-                    state.recipient.publicKey,
-                )
+            const { encryptedStream, encryptedAesKey, iv } = await EncryptStream(
+                localStream,
+                state.account.wallet.privateKey,
+                state.recipient.publicKey,
+            )
 
-                // ** for presentation purposes - befor and after encryption ** //
-                // console.log("connection - on open - send localStream")
-                // Check that the stream is valid before converting to base64
-                /* if (localStream instanceof MediaStream) {
+            // ** for presentation purposes - before and after encryption ** //
+            // console.log("connection - on open - send localStream")
+            // Check that the stream is valid before converting to base64
+            /* if (localStream instanceof MediaStream) {
                     const originalStreamBase64 = await streamToBase64(localStream)
                     console.log("localStream original", originalStreamBase64)
                 } else {
@@ -177,12 +174,9 @@ export const usePeer = (dispatch, state) => {
                     console.error("encryptedStream is not a valid MediaStream")
                 } */
 
-                callToSet = peer.call(conn.peer, encryptedStream, {
-                    metadata: { encryptedAesKey, iv, pk: state.account.wallet.publicKey },
-                })
-            } else {
-                callToSet = peer.call(conn.peer, localStream)
-            }
+            callToSet = peer.call(conn.peer, encryptedStream, {
+                metadata: { encryptedAesKey, iv, pk: state.account.wallet.publicKey },
+            })
 
             setCall(callToSet)
             dispatch({ type: "SET_PEER", payload: { call: callToSet } })
@@ -192,14 +186,13 @@ export const usePeer = (dispatch, state) => {
 
             callToSet.peerConnection.ontrack = async (event) => {
                 let streamToSet = event.streams[0]
-                if (state.mode === invType.Secure) {
-                    streamToSet = await DecryptStream(
-                        streamToSet,
-                        callToSet.metadata.encryptedAesKey,
-                        callToSet.metadata.iv,
-                        state.account.wallet.privateKey,
-                    )
-                }
+
+                streamToSet = await DecryptStream(
+                    streamToSet,
+                    callToSet.metadata.encryptedAesKey,
+                    callToSet.metadata.iv,
+                    state.account.wallet.privateKey,
+                )
                 //console.log("connection - on open - callToSet - on track")
                 //console.log("streamToSet dec", streamToSet)
                 setRemoteStream(streamToSet)
@@ -209,7 +202,7 @@ export const usePeer = (dispatch, state) => {
 
         conn.on("data", async (data) => {
             console.log("Received data on connection:", data)
-            if (state.mode === invType.Secure && typeof data === "object" && data.encryptedText) {
+            if (typeof data === "object" && data.encryptedText) {
                 const decryptedData = await DecryptText(
                     data.encryptedText,
                     data.encryptedAesKey,
@@ -241,14 +234,14 @@ export const usePeer = (dispatch, state) => {
         if (!call) return
         call.on("stream", async (remoteStream) => {
             let streamToSet = remoteStream
-            if (state.mode === invType.Secure) {
-                streamToSet = await DecryptStream(
-                    remoteStream,
-                    call.metadata.encryptedAesKey,
-                    call.metadata.iv,
-                    state.account.wallet.privateKey,
-                )
-            }
+
+            streamToSet = await DecryptStream(
+                remoteStream,
+                call.metadata.encryptedAesKey,
+                call.metadata.iv,
+                state.account.wallet.privateKey,
+            )
+
             //console.log("call - on stream")
             //console.log("streamToSet dec", streamToSet)
             setRemoteStream(streamToSet)
@@ -344,13 +337,13 @@ export const usePeer = (dispatch, state) => {
 
     useEffect(() => {
         if (state.connectExt) {
-            const { idj, tpj, pkj } = useInvitationLink(state.connectExt)
-            if(idj && tpj && pkj) {
-                dispatch({ type: "SET_RECIPIENT", payload: { recipient: { address: idj, publicKey: pkj }, tp: tpj } })
+            const { idj, pkj } = useInvitationLink(state.connectExt)
+            if (idj && pkj) {
+                dispatch({ type: "SET_RECIPIENT", payload: { recipient: { address: idj, publicKey: pkj } } })
                 setTimeout(() => {
                     dispatch({ type: "CONNECT_EXT", payload: null })
                 }, 1000)
-            }                               
+            }
         }
     }, [state.connectExt])
 
